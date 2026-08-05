@@ -9,5 +9,19 @@
         android:id="@+id/regionFragment"
         android:name="com.opsat.getmemymap.ui.region.RegionFragment"
         android:label="region_item_list"
-        tools:layout="@layout/region_item_list" />
+        tools:layout="@layout/region_item_list" >
+        <argument
+            android:name="parentRegionName"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null"/>
+        <action
+            android:id="@+id/action_regionFragment_self"
+            app:destination="@id/regionFragment">
+            <argument
+                android:name="parentRegionName"
+                app:nullable="true"
+                android:defaultValue="@null"/>
+        </action>
+    </fragment>
 </navigation>

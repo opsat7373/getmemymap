@@ -8,11 +8,12 @@ import com.opsat.getmemymap.ui.placeholder.PlaceholderContent.PlaceholderItem
 import com.opsat.getmemymap.databinding.RegionItemBinding
 import com.opsat.getmemymap.domain.model.RegionModel
 
-class MyRegionRecyclerViewAdapter : RecyclerView.Adapter<MyRegionRecyclerViewAdapter.ViewHolder>() {
+class MyRegionRecyclerViewAdapter(val onItemClick : (String) -> Unit = {} ) : RecyclerView.Adapter<MyRegionRecyclerViewAdapter.ViewHolder>() {
 
     private val values = mutableListOf<PlaceholderItem>()
 
     fun setList(list : List<RegionModel>) {
+        values.clear()
         list.forEach { region ->
             values.add (PlaceholderItem("", region.name, ""))
         }
@@ -35,6 +36,9 @@ class MyRegionRecyclerViewAdapter : RecyclerView.Adapter<MyRegionRecyclerViewAda
         val item = values[position]
         holder.idView.text = item.id
         holder.contentView.text = item.content
+        holder.contentView.setOnClickListener {
+            onItemClick(item.content)
+        }
     }
 
     override fun getItemCount(): Int = values.size

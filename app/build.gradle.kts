@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.navigation.safeargs)
 }
 
 android {
@@ -42,9 +43,6 @@ android {
 }
 
 dependencies {
-
-    // Jetpack Compose integration
-    implementation(libs.navigation.compose)
 
     // Views/Fragments integration
     implementation(libs.navigation.fragment)

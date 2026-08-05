@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.opsat.getmemymap.R
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,8 +21,12 @@ class RegionFragment : Fragment() {
 
     val regionViewModel : RegionViewModel by viewModels()
 
+    val args: RegionFragmentArgs by navArgs()
 
-    val adapter = MyRegionRecyclerViewAdapter()
+
+    val adapter = MyRegionRecyclerViewAdapter { regionName ->
+        findNavController().navigate(RegionFragmentDirections.actionRegionFragmentSelf(regionName))
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,7 +41,7 @@ class RegionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter.setList(regionViewModel.getRegionsList())
+        adapter.setList(regionViewModel.getRegionsList(args.parentRegionName))
 
     }
 }

@@ -11,8 +11,7 @@ class RegionViewModel @Inject constructor(
     private val repository: RegionRepository
 ): ViewModel() {
 
-
-    fun getRegionsList() : List<RegionModel> {
-        return repository.getRegionsList()
+    fun getRegionsList(parentRegionName: String?) : List<RegionModel> {
+        return repository.getRegionsList(parentRegionName ?: "europe")
     }
 }

@@ -7,9 +7,10 @@ import javax.inject.Inject
 class RegionRepositoryImpl @Inject constructor(
     private val assetsDataSource: AssetsDataSource) : RegionRepository {
 
+        var regionMap : Map<String?, MutableList<RegionModel>> = assetsDataSource.getMapsList()
 
 
-    override fun getRegionsList(): List<RegionModel>{
-        return assetsDataSource.getMapsList()
+    override fun getRegionsList(parentRegionName: String?): List<RegionModel>{
+        return regionMap[parentRegionName] ?: emptyList()
     }
 }

@@ -12,13 +12,13 @@ class AssetsDataSource @Inject constructor(
     private val context: Context
 ) {
 
-    fun getMapsList() : List<RegionModel> {
+    fun getMapsList() : Map<String?, MutableList<RegionModel>> {
 
         val parser = Xml.newPullParser()
         parser.setInput(context.assets.open("regions.xml"), "UTF-8")
 
-        val stack = ArrayDeque<RegionModel>()
-        val roots = mutableListOf<RegionModel>()
+        val stack = ArrayDeque<String?>()
+        val resultList = mutableMapOf<String?, MutableList<RegionModel>>()
 
         while (parser.eventType != XmlPullParser.END_DOCUMENT) {
 
@@ -32,13 +32,18 @@ class AssetsDataSource @Inject constructor(
 
                         val region = RegionModel(name)
 
-                        if (stack.isEmpty()) {
-                            roots += region
+                        val parentId = if (stack.isEmpty()) {
+                            null
                         } else {
-                            stack.last().children += region
+                             stack.last()
                         }
+                        stack.addLast(name)
 
-                        stack.addLast(region)
+                        if (!resultList.containsKey(parentId)) {
+                            resultList[parentId] = mutableListOf()
+                        }
+                        resultList[parentId]?.add(region)
+
                     }
                 }
 
@@ -53,6 +58,6 @@ class AssetsDataSource @Inject constructor(
             parser.next()
         }
 
-        return roots.first().children
+        return resultList
     }
 }
