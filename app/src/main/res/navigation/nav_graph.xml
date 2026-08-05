@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/regionFragment">
+
+    <fragment
+        android:id="@+id/regionFragment"
+        android:name="com.opsat.getmemymap.ui.region.RegionFragment"
+        android:label="region_item_list"
+        tools:layout="@layout/region_item_list" />
+</navigation>
