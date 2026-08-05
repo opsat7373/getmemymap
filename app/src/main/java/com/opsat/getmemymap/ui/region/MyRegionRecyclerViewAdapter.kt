@@ -4,17 +4,20 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
-
 import com.opsat.getmemymap.ui.placeholder.PlaceholderContent.PlaceholderItem
 import com.opsat.getmemymap.databinding.RegionItemBinding
+import com.opsat.getmemymap.domain.model.RegionModel
 
-/**
- * [RecyclerView.Adapter] that can display a [PlaceholderItem].
- * TODO: Replace the implementation with code for your data type.
- */
-class MyRegionRecyclerViewAdapter(
-    private val values: List<PlaceholderItem>
-) : RecyclerView.Adapter<MyRegionRecyclerViewAdapter.ViewHolder>() {
+class MyRegionRecyclerViewAdapter : RecyclerView.Adapter<MyRegionRecyclerViewAdapter.ViewHolder>() {
+
+    private val values = mutableListOf<PlaceholderItem>()
+
+    fun setList(list : List<RegionModel>) {
+        list.forEach { region ->
+            values.add (PlaceholderItem("", region.name, ""))
+        }
+        notifyItemInserted(list.lastIndex)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
@@ -36,7 +39,7 @@ class MyRegionRecyclerViewAdapter(
 
     override fun getItemCount(): Int = values.size
 
-    inner class ViewHolder(binding: RegionItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(binding: RegionItemBinding) : RecyclerView.ViewHolder(binding.root) {
         val idView: TextView = binding.itemNumber
         val contentView: TextView = binding.content
 
