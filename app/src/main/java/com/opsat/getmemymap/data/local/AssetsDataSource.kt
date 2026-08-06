@@ -12,13 +12,14 @@ class AssetsDataSource @Inject constructor(
     private val context: Context
 ) {
 
-    fun getMapsList() : Map<String?, MutableList<RegionModel>> {
+    fun getMapsList() : Map<String?, List<RegionModel>> {
 
         val parser = Xml.newPullParser()
         parser.setInput(context.assets.open("regions.xml"), "UTF-8")
 
         val stack = ArrayDeque<String?>()
-        val resultList = mutableMapOf<String?, MutableList<RegionModel>>()
+        val tempList = mutableMapOf<String?, MutableList<String>>()
+
 
         while (parser.eventType != XmlPullParser.END_DOCUMENT) {
 
@@ -28,21 +29,19 @@ class AssetsDataSource @Inject constructor(
 
                     if (parser.name == "region") {
 
-                        val name = parser.getAttributeValue(null, "name") ?: ""
-
-                        val region = RegionModel(name)
+                        val regionName = parser.getAttributeValue(null, "name") ?: ""
 
                         val parentId = if (stack.isEmpty()) {
                             null
                         } else {
                              stack.last()
                         }
-                        stack.addLast(name)
+                        stack.addLast(regionName)
 
-                        if (!resultList.containsKey(parentId)) {
-                            resultList[parentId] = mutableListOf()
+                        if (!tempList.containsKey(parentId)) {
+                            tempList[parentId] = mutableListOf()
                         }
-                        resultList[parentId]?.add(region)
+                        tempList[parentId]?.add(regionName)
 
                     }
                 }
@@ -58,6 +57,13 @@ class AssetsDataSource @Inject constructor(
             parser.next()
         }
 
-        return resultList
+
+
+        return tempList.mapValues{(_, childList) ->
+            childList.map { regionName ->
+                RegionModel(regionName,
+                    hasChild = tempList[regionName]?.isNotEmpty() ?: false)
+            }
+        }
     }
 }

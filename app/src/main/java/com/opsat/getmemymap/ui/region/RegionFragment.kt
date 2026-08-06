@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -24,8 +25,8 @@ class RegionFragment : Fragment() {
     val args: RegionFragmentArgs by navArgs()
 
 
-    val adapter = MyRegionRecyclerViewAdapter { regionName ->
-        findNavController().navigate(RegionFragmentDirections.actionRegionFragmentSelf(regionName))
+    val adapter = MyRegionRecyclerViewAdapter { region ->
+        findNavController().navigate(RegionFragmentDirections.actionRegionFragmentSelf(region.name))
     }
 
     override fun onCreateView(
@@ -42,6 +43,9 @@ class RegionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adapter.setList(regionViewModel.getRegionsList(args.parentRegionName))
+        (requireActivity() as AppCompatActivity)
+            .supportActionBar
+            ?.title = args.parentRegionName?.replaceFirstChar { it.uppercase() }?: "Downloads Map"
 
     }
 }
