@@ -1,13 +1,11 @@
 package com.opsat.getmemymap.ui.region
 
-import android.graphics.drawable.Icon
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
-import com.opsat.getmemymap.ui.placeholder.PlaceholderContent.PlaceholderItem
 import com.opsat.getmemymap.databinding.RegionItemBinding
 import com.opsat.getmemymap.domain.model.RegionModel
 
