@@ -35,10 +35,8 @@ class MyRegionRecyclerViewAdapter(val onItemClick : (RegionModel) -> Unit = {} )
         val item = values[position]
         holder.contentView.text = item.name
         holder.importButton.visibility = if (item.hasChild) View.INVISIBLE else View.VISIBLE
-        if (item.hasChild) {
-            holder.root.setOnClickListener {
-                onItemClick(item)
-            }
+        holder.root.setOnClickListener {
+            onItemClick(item)
         }
     }
 
