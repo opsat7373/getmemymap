@@ -22,7 +22,7 @@ class RegionViewModel @Inject constructor(
     private val downloadRepository: DownloadRepository
 ): ViewModel() {
 
-    private val selectedParentName = MutableStateFlow<String>("")
+    private val selectedParentName = MutableStateFlow("europe")
 
     val regions: StateFlow<List<RegionModel>> =
         selectedParentName

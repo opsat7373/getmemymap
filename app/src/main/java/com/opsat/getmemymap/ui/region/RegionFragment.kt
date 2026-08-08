@@ -16,6 +16,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.opsat.getmemymap.R
+import com.opsat.getmemymap.databinding.FragmentMemoryMonitorBinding
+import com.opsat.getmemymap.databinding.RegionItemListBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -24,6 +26,8 @@ import kotlinx.coroutines.launch
  */
 @AndroidEntryPoint
 class RegionFragment : Fragment() {
+
+    private lateinit var binding: RegionItemListBinding
 
     val regionViewModel : RegionViewModel by viewModels()
 
@@ -41,19 +45,20 @@ class RegionFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.region_item_list, container, false)
-        val rv = view.findViewById<RecyclerView>(R.id.list)
-        rv.layoutManager = LinearLayoutManager(context)
-        rv.adapter = adapter
-        return view
+    ): View {
+        binding = RegionItemListBinding.inflate(inflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.list.layoutManager = LinearLayoutManager(context)
+        binding.list.adapter = adapter
+        val regionName = args.parentRegionName
         (requireActivity() as AppCompatActivity)
             .supportActionBar
-            ?.title = args.parentRegionName.replaceFirstChar { it.uppercase() }?: "Downloads Map"
+            ?.title = if (regionName == "europe") "Downloads Map" else regionName.replaceFirstChar { it.uppercase() }
+        binding.memoryMonitorContainer.visibility = if(args.showMemoryInfo) View.VISIBLE else View.GONE
         observeRegions()
         regionViewModel.selectParent(args.parentRegionName)
 

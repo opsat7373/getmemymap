@@ -14,7 +14,11 @@
             android:name="parentRegionName"
             app:argType="string"
             app:nullable="false"
-            android:defaultValue=""/>
+            android:defaultValue="europe"/>
+        <argument
+            android:name="showMemoryInfo"
+            app:argType="boolean"
+            android:defaultValue="true"/>
         <action
             android:id="@+id/action_regionFragment_self"
             app:destination="@id/regionFragment">
@@ -22,6 +26,9 @@
                 android:name="parentRegionName"
                 app:nullable="false"
                 android:defaultValue=""/>
+            <argument
+                android:name="showMemoryInfo"
+                android:defaultValue="false"/>
         </action>
     </fragment>
 </navigation>

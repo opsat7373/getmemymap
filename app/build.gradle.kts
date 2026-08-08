@@ -50,6 +50,9 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     // Views/Fragments integration
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
