@@ -36,23 +36,9 @@ interface DownloadDao {
     @Query("""
         SELECT *
         FROM downloads
-        WHERE regionId = :regionId
-    """)
-    suspend fun get(regionId: String): DownloadEntity?
-
-    @Query("""
-        SELECT *
-        FROM downloads
         ORDER BY queuePosition
     """)
     fun observeQueue(): Flow<List<DownloadEntity>>
-
-    @Query("""
-        SELECT *
-        FROM downloads
-        WHERE regionId = :regionId
-    """)
-    fun observe(regionId: String): Flow<DownloadEntity?>
 
     @Query("""
         SELECT *
@@ -79,30 +65,6 @@ interface DownloadDao {
         LIMIT 1
     """)
     suspend fun getNextInQueue(): DownloadEntity?
-
-    @Query("""
-        UPDATE downloads
-        SET
-            downloadedBytes = :downloadedBytes,
-            totalBytes = :totalBytes
-        WHERE regionId = :regionId
-    """)
-    suspend fun updateProgress(
-        regionId: String,
-        downloadedBytes: Long,
-        totalBytes: Long
-    )
-
-    @Query("""
-        UPDATE downloads
-        SET
-            state = :state
-        WHERE regionId = :regionId
-    """)
-    suspend fun updateState(
-        regionId: String,
-        state: DbDownloadState
-    )
 
     @Query("""
         UPDATE downloads

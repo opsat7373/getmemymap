@@ -8,5 +8,7 @@ interface DownloadRepository {
 
     suspend fun addDownloadMap(region : RegionModel)
 
+    suspend fun stopDownloadMap(region : RegionModel)
+
     fun getRegionDownloadInfo(parentRegionName : String?) : Flow<List<RegionDownloadInfoModel>>
 }

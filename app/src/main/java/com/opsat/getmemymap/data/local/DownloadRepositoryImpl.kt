@@ -19,11 +19,10 @@ class DownloadRepositoryImpl @Inject constructor(
         val downloadFileName = region.downloadFileName
         if (downloadFileName != null) {
             val downloadEntity = DownloadEntity(
-                region.name,
                 region.parentRegionName,
                 region.name,
                 downloadFileName,
-                "",
+                downloadFileName,
                 -1,
                 DbDownloadState.QUEUED,
                 -1,
@@ -31,6 +30,24 @@ class DownloadRepositoryImpl @Inject constructor(
 
             )
             downloadDao.insertWithNextQueue(downloadEntity)
+        }
+    }
+
+    override suspend fun stopDownloadMap(region: RegionModel) {
+        val downloadFileName = region.downloadFileName
+        if (downloadFileName != null) {
+            val downloadEntity = DownloadEntity(
+                region.parentRegionName,
+                region.name,
+                downloadFileName,
+                downloadFileName,
+                -1,
+                DbDownloadState.UNKNOWN,
+                -1,
+                -1
+
+            )
+            downloadDao.delete(downloadEntity)
         }
     }
 

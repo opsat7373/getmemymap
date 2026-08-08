@@ -17,7 +17,7 @@ class AssetsDataSource @Inject constructor(
         parser.setInput(context.assets.open("regions.xml"), "UTF-8")
 
         val stack = ArrayDeque<String?>()
-        val tempList = mutableMapOf<String?, MutableList<String>>()
+        val tempList = mutableMapOf<String, MutableList<String>>()
         val regionMap = mutableMapOf<String, Map<String, String>>()
 
 
@@ -40,9 +40,9 @@ class AssetsDataSource @Inject constructor(
                         regionMap[regionName] = parsedRegionInfo
 
                         val parentId = if (stack.isEmpty()) {
-                            null
+                            ""
                         } else {
-                             stack.last()
+                             stack.last() ?: ""
                         }
                         stack.addLast(regionName)
 
@@ -73,7 +73,7 @@ class AssetsDataSource @Inject constructor(
                 val regionPrefix = (regionMap[parentRegionName]?: emptyMap()) ["inner_download_prefix"]
                 val region = RegionXml(
                     name = regionName,
-                    parentRegionName = parentRegionName,
+                    parentRegionName = parentRegionName ?: "",
                     downloadPrefix = regionPrefix,
                     hasChild = tempList[regionName]?.isNotEmpty() ?: false
                     )

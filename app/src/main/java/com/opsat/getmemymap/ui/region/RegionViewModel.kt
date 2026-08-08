@@ -22,7 +22,7 @@ class RegionViewModel @Inject constructor(
     private val downloadRepository: DownloadRepository
 ): ViewModel() {
 
-    private val selectedParentName = MutableStateFlow<String?>(null)
+    private val selectedParentName = MutableStateFlow<String>("")
 
     val regions: StateFlow<List<RegionModel>> =
         selectedParentName
@@ -34,13 +34,19 @@ class RegionViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = emptyList())
 
-    fun selectParent(parentName: String?) {
+    fun selectParent(parentName: String) {
         selectedParentName.value = parentName
     }
 
     fun startDownloadMap(region : RegionModel) {
         viewModelScope.launch {
             downloadRepository.addDownloadMap(region)
+        }
+    }
+
+    fun stopDownloadMap(region : RegionModel) {
+        viewModelScope.launch {
+            downloadRepository.stopDownloadMap(region)
         }
     }
 }

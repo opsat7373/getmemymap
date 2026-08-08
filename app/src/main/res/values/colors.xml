@@ -4,4 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#ff8800</color>
     <color name="background">#e68200</color>
+
+    <color name="green">#5FC566</color>
+    <color name="original_icon_color">#727272</color>
 </resources>

@@ -23,10 +23,26 @@
         android:layout_marginStart="64dp"
         android:textAppearance="?attr/textAppearanceListItem"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Denmark" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:layout_marginEnd="32dp"
+        android:max="100"
+        app:layout_constraintBottom_toTopOf="@+id/materialDivider"
+        app:layout_constraintEnd_toStartOf="@+id/downloadIcon"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@id/content"
+        app:layout_constraintTop_toBottomOf="@+id/content"
+        tools:progress="45"
+        tools:visibility="visible" />
+
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/downloadIcon"
@@ -38,7 +54,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/stopDownloadIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/materialDivider"
         android:layout_width="0dp"
         android:layout_height="1dp"
         app:layout_constraintBottom_toBottomOf="parent"

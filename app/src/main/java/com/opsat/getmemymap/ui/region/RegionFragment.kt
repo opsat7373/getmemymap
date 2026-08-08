@@ -1,6 +1,7 @@
 package com.opsat.getmemymap.ui.region
 
 import android.os.Bundle
+import android.os.StatFs
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,7 +30,7 @@ class RegionFragment : Fragment() {
     val args: RegionFragmentArgs by navArgs()
 
 
-    val adapter = MyRegionRecyclerViewAdapter { region ->
+    val adapter = MyRegionRecyclerViewAdapter({region -> regionViewModel.stopDownloadMap(region)}) { region ->
         if (region.hasChild) {
             findNavController().navigate(RegionFragmentDirections.actionRegionFragmentSelf(region.name))
         } else {
@@ -52,7 +53,7 @@ class RegionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         (requireActivity() as AppCompatActivity)
             .supportActionBar
-            ?.title = args.parentRegionName?.replaceFirstChar { it.uppercase() }?: "Downloads Map"
+            ?.title = args.parentRegionName.replaceFirstChar { it.uppercase() }?: "Downloads Map"
         observeRegions()
         regionViewModel.selectParent(args.parentRegionName)
 

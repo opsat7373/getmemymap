@@ -9,14 +9,12 @@ import androidx.room.PrimaryKey
     indices = [
         Index("state"),
         Index("queuePosition")
-    ]
+    ],
+    primaryKeys = ["parentRegionName", "regionName"]
 )
 data class DownloadEntity(
 
-    @PrimaryKey
-    val regionId: String,
-
-    val parentRegionName: String?,
+    val parentRegionName: String,
 
     val regionName: String,
 
