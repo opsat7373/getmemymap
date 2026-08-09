@@ -2,6 +2,7 @@ package com.opsat.getmemymap.di;
 
 import android.content.Context
 import androidx.work.WorkManager
+import com.opsat.getmemymap.data.downloader.DownloadController
 import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
@@ -27,5 +28,13 @@ object NetworkModule {
         @ApplicationContext context: Context
     ): WorkManager {
         return WorkManager.getInstance(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDownloadController(
+        client: OkHttpClient
+    ): DownloadController {
+        return DownloadController(client)
     }
 }

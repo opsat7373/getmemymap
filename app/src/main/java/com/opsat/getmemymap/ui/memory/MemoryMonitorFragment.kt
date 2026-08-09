@@ -44,7 +44,7 @@ class MemoryMonitorFragment : Fragment() {
                     val total = memoryInfo?.totalBytes ?: 1
                     val free = memoryInfo?.freeBytes ?: 0
                     val freeGb = free  / 1024.0 / 1024.0 / 1024.0
-                    val percent = (free / total.toDouble()) * 100
+                    val percent = 100 - (free / total.toDouble()) * 100
                     binding.deviceMemoryInfo.text = String.format(
                         Locale.US,
                         "Free %.2f Gb",

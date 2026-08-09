@@ -10,18 +10,14 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.opsat.getmemymap.R
+import com.opsat.getmemymap.data.downloader.DownloadController
+import com.opsat.getmemymap.data.downloader.DownloadResult
 import com.opsat.getmemymap.domain.model.DownloadState
-import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import okhttp3.Call
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 
 @HiltWorker
@@ -29,11 +25,13 @@ class DownloadWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val repository: DownloadRepository,
-    private val okHttpClient: OkHttpClient
+    private val downloadController : DownloadController
 ) : CoroutineWorker(
     appContext,
     workerParams
 ) {
+
+    private var currentCall: Call? = null
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -55,7 +53,6 @@ class DownloadWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         createNotificationChannel()
-
         do {
             val downloadInfoModel =
                 repository.getEnqueuedDownloads()
@@ -68,27 +65,88 @@ class DownloadWorker @AssistedInject constructor(
                     )
                 )
                 try {
-
                     repository.updateDownload(
                         downloadInfoModel.copy(
                             state = DownloadState.DOWNLOADING
                         )
                     )
-                    downloadFile(downloadInfoModel)
+                    val url = "https://download.osmand.net/download.php?standard=yes&file=${downloadInfoModel.downloadUrl}"
+                    val directory = applicationContext.filesDir
 
-                    repository.updateDownload(
-                        downloadInfoModel.copy(
-                            state = DownloadState.COMPLETED
-                        )
+                    val partFileName = "${downloadInfoModel.localFile}_part"
+                    val destinationFileName = "${downloadInfoModel.localFile}"
+
+
+                    val file = File(directory, partFileName)
+
+                    file.delete()
+
+                    val downloadFlow = downloadController.download(
+                        url,
+                        downloadInfoModel.regionId,
+                        file
                     )
+
+                    downloadFlow.collect { downloadResult ->
+                        when(downloadResult) {
+                            DownloadResult.Cancelled -> {
+                                file.delete()
+                            }
+                            is DownloadResult.DownloadProgress -> {
+                                val progress =
+                                    ((downloadResult.downloadedBytes * 100) / downloadResult.totalBytes)
+                                        .toInt()
+
+                                repository.updateDownload(
+                                    downloadInfoModel.copy(
+                                        state = DownloadState.DOWNLOADING,
+                                        downloadedBytes = downloadResult.downloadedBytes,
+                                        totalBytes = downloadResult.totalBytes
+                                    )
+
+                                )
+
+                                setForeground(
+                                    createForegroundInfo(
+                                        downloadInfoModel.regionName,
+                                        progress
+                                    )
+                                )
+                            }
+
+                            is DownloadResult.Error -> repository.updateDownload(
+                                downloadInfoModel.copy(
+                                    state = DownloadState.FAILED
+                                )
+                            )
+                            DownloadResult.Success -> {
+
+                                file.renameTo(
+                                    File(file.parentFile, destinationFileName)
+                                )
+
+                                repository.updateDownload(
+                                    downloadInfoModel.copy(
+                                        state = DownloadState.COMPLETED
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+
                 } catch (e: IOException) {
+                    if (currentCall?.isCanceled() == true ) {
+                        val a = 5
+                    } else {
 
-                    repository.updateDownload(
-                        downloadInfoModel.copy(
-                            state = DownloadState.FAILED
+                        repository.updateDownload(
+                            downloadInfoModel.copy(
+                                state = DownloadState.FAILED
+                            )
                         )
-                    )
-                    return Result.retry()
+                        return Result.retry()
+                    }
 
                 } catch (e: Exception) {
 
@@ -103,99 +161,6 @@ class DownloadWorker @AssistedInject constructor(
 
         } while (downloadInfoModel != null)
         return Result.success()
-    }
-
-    private suspend fun downloadFile(
-        downloadModel: RegionDownloadInfoModel
-    ) = withContext(Dispatchers.IO) {
-
-        val request = Request.Builder()
-            .url("https://download.osmand.net/download.php?standard=yes&file=${downloadModel.downloadUrl}")
-            .build()
-
-        okHttpClient
-            .newCall(request)
-            .execute()
-            .use { response ->
-
-                if (!response.isSuccessful) {
-                    throw IOException(
-                        "HTTP ${response.code}"
-                    )
-                }
-
-                val body = response.body
-                    ?: throw IOException("Empty response body")
-
-                val totalBytes = body.contentLength()
-
-                if (totalBytes <= 0) {
-                    throw IOException(
-                        "Unknown content length"
-                    )
-                }
-                val directory = applicationContext.filesDir
-
-                val file = File(directory,downloadModel.localFile)
-
-                file.parentFile?.mkdirs()
-
-                body.byteStream().use { input ->
-
-                    FileOutputStream(file).use { output ->
-
-                        val buffer = ByteArray(8 * 1024)
-
-                        var downloadedBytes = 0L
-                        var lastProgress = -1
-
-                        while (true) {
-
-                            val read = input.read(buffer)
-
-                            if (read == -1) {
-                                break
-                            }
-
-                            output.write(
-                                buffer,
-                                0,
-                                read
-                            )
-
-                            downloadedBytes += read
-
-                            val progress =
-                                ((downloadedBytes * 100) / totalBytes)
-                                    .toInt()
-
-                            if (progress != lastProgress) {
-
-                                lastProgress = progress
-
-                                repository.updateDownload(
-                                    downloadModel.copy(
-                                        downloadedBytes = downloadedBytes,
-                                        totalBytes = totalBytes
-                                    )
-
-                                )
-
-                                setForeground(
-                                    createForegroundInfo(
-                                        downloadModel.regionName,
-                                        progress
-                                    )
-                                )
-
-
-                            }
-                        }
-
-                        output.flush()
-                    }
-                }
-            }
     }
 
     private fun createForegroundInfo(
