@@ -4,14 +4,12 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import android.os.Environment
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.opsat.getmemymap.R
-import com.opsat.getmemymap.data.local.database.DownloadEntity
 import com.opsat.getmemymap.domain.model.DownloadState
 import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository

@@ -36,7 +36,7 @@ class RegionFragment : Fragment() {
 
     val adapter = MyRegionRecyclerViewAdapter({region -> regionViewModel.stopDownloadMap(region)}) { region ->
         if (region.hasChild) {
-            findNavController().navigate(RegionFragmentDirections.actionRegionFragmentSelf(region.name))
+            findNavController().navigate(RegionFragmentDirections.actionRegionFragmentSelf(region.regionName))
         } else {
             regionViewModel.startDownloadMap(region)
         }
@@ -69,8 +69,8 @@ class RegionFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(
                 Lifecycle.State.STARTED
             ) {
-                regionViewModel.regions.collect { regions ->
-                    adapter.setList(regions)
+                regionViewModel.regions.collect { regionsList ->
+                    adapter.submitList(regionsList)
                 }
             }
         }

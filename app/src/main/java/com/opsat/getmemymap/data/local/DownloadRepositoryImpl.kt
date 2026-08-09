@@ -5,8 +5,8 @@ import com.opsat.getmemymap.data.local.database.DownloadEntity
 import com.opsat.getmemymap.data.local.database.DbDownloadState
 import com.opsat.getmemymap.data.mapper.toDbEntity
 import com.opsat.getmemymap.data.mapper.toDomainModel
-import com.opsat.getmemymap.domain.model.DownloadState
 import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
+import com.opsat.getmemymap.domain.model.RegionInfoModel
 import com.opsat.getmemymap.domain.model.RegionModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository
 import kotlinx.coroutines.flow.Flow
@@ -17,10 +17,11 @@ class DownloadRepositoryImpl @Inject constructor(
 
     private val downloadDao: DownloadDao
 ) : DownloadRepository {
-    override suspend fun addDownloadMap(region: RegionModel) {
+    override suspend fun addDownloadMap(region: RegionInfoModel) {
         val downloadFileName = region.downloadFileName
         if (downloadFileName != null) {
             val downloadEntity = DownloadEntity(
+                region.regionId,
                 region.parentRegionName,
                 region.name,
                 downloadFileName,
@@ -35,10 +36,11 @@ class DownloadRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun stopDownloadMap(region: RegionModel) {
+    override suspend fun stopDownloadMap(region: RegionInfoModel) {
         val downloadFileName = region.downloadFileName
         if (downloadFileName != null) {
             val downloadEntity = DownloadEntity(
+                region.regionId,
                 region.parentRegionName,
                 region.name,
                 downloadFileName,

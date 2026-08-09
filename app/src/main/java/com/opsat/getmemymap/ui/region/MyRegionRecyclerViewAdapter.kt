@@ -9,20 +9,16 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import com.opsat.getmemymap.R
 import com.opsat.getmemymap.databinding.RegionItemBinding
 import com.opsat.getmemymap.domain.model.DownloadState
 import com.opsat.getmemymap.domain.model.RegionModel
 
-class MyRegionRecyclerViewAdapter(val onCancelClick : (RegionModel) -> Unit = {}, val onItemClick : (RegionModel) -> Unit = {} ) : RecyclerView.Adapter<MyRegionRecyclerViewAdapter.ViewHolder>() {
-
-    private val values = mutableListOf<RegionModel>()
-
-    fun setList(list : List<RegionModel>) {
-        values.clear()
-        values += list
-        notifyDataSetChanged()
-    }
+class MyRegionRecyclerViewAdapter(val onCancelClick : (RegionUIItem) -> Unit = {},
+                                  val onItemClick : (RegionUIItem) -> Unit = {} )
+    : ListAdapter<RegionUIItem, MyRegionRecyclerViewAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
@@ -37,9 +33,9 @@ class MyRegionRecyclerViewAdapter(val onCancelClick : (RegionModel) -> Unit = {}
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
+        val item = getItem(position)
         val downloadStarted = item.state == DownloadState.DOWNLOADING || item.state == DownloadState.QUEUED
-        holder.contentView.text = item.name
+        holder.contentView.text = item.regionName
         holder.downloadButton.visibility = if (!item.hasChild && item.state == DownloadState.UNKNOWN) View.VISIBLE else View.INVISIBLE
         holder.cancelButton.visibility = if (downloadStarted) View.VISIBLE else View.INVISIBLE
         holder.progressBar.visibility = if (downloadStarted) View.VISIBLE else View.GONE
@@ -53,8 +49,8 @@ class MyRegionRecyclerViewAdapter(val onCancelClick : (RegionModel) -> Unit = {}
             PorterDuff.Mode.SRC_IN
         )
 
-        val progress = ((item.downloadedBytes.toDouble() / maxOf(item.totalBytes, 1)) * 100).toInt()
-        holder.progressBar.setProgress(progress, false)
+
+        holder.progressBar.setProgress(item.downloadProgress, false)
         holder.root.setOnClickListener {
             onItemClick(item)
         }
@@ -62,8 +58,6 @@ class MyRegionRecyclerViewAdapter(val onCancelClick : (RegionModel) -> Unit = {}
             onCancelClick(item)
         }
     }
-
-    override fun getItemCount(): Int = values.size
 
     class ViewHolder(binding: RegionItemBinding) : RecyclerView.ViewHolder(binding.root) {
         val root = binding.root
@@ -77,6 +71,23 @@ class MyRegionRecyclerViewAdapter(val onCancelClick : (RegionModel) -> Unit = {}
 
         override fun toString(): String {
             return super.toString() + " '" + contentView.text + "'"
+        }
+    }
+
+    class DiffCallback : DiffUtil.ItemCallback<RegionUIItem>() {
+
+        override fun areItemsTheSame(
+            oldItem: RegionUIItem,
+            newItem: RegionUIItem
+        ): Boolean {
+            return oldItem.downloadFileName == newItem.downloadFileName && oldItem.regionName == newItem.regionName
+        }
+
+        override fun areContentsTheSame(
+            oldItem: RegionUIItem,
+            newItem: RegionUIItem
+        ): Boolean {
+            return oldItem == newItem
         }
     }
 

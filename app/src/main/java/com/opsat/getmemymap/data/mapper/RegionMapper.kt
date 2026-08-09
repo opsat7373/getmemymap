@@ -8,6 +8,7 @@ import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
 import com.opsat.getmemymap.domain.model.RegionInfoModel
 
 fun RegionXml.toDomainModel() = RegionInfoModel(
+    regionId = "${parentRegionName}_${name}",
     name = name,
     parentRegionName = parentRegionName,
     downloadFileName = "${downloadPrefix}${name}_europe_2.obf.zip".replaceFirstChar { it.uppercase() },
@@ -16,6 +17,7 @@ fun RegionXml.toDomainModel() = RegionInfoModel(
 
 fun DownloadEntity.toDomainModel() =
     RegionDownloadInfoModel(
+        regionId = "${parentRegionName}_${regionName}",
         regionName = regionName,
         parentRegionName = parentRegionName,
         downloadUrl = downloadUrl,
@@ -28,6 +30,7 @@ fun DownloadEntity.toDomainModel() =
 
 fun RegionDownloadInfoModel.toDbEntity() =
     DownloadEntity (
+        regionId = "${parentRegionName}_${regionName}",
         regionName = regionName,
         parentRegionName = parentRegionName,
         downloadUrl = downloadUrl ?: "",

@@ -10,9 +10,10 @@ import androidx.room.PrimaryKey
         Index("state"),
         Index("queuePosition")
     ],
-    primaryKeys = ["parentRegionName", "regionName"]
+    primaryKeys = ["regionId"]
 )
 data class DownloadEntity(
+    val regionId : String,
 
     val parentRegionName: String,
 

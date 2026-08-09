@@ -22,4 +22,13 @@ class RegionRepositoryImpl @Inject constructor(
     override fun getRegionsInfoList(parentRegionName: String?): List<RegionInfoModel>{
         return regionMap[parentRegionName] ?: emptyList()
     }
+
+    override fun getRegionById(regionId: String): RegionInfoModel {
+        return regionMap
+            .flatMap { regionMapEntry -> regionMapEntry.value  }
+            .first { region ->
+                region.regionId == regionId
+
+            }
+    }
 }

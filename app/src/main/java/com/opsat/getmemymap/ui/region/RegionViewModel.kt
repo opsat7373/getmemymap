@@ -7,12 +7,14 @@ import com.opsat.getmemymap.domain.repository.DownloadRepository
 import com.opsat.getmemymap.domain.repository.RegionRepository
 import com.opsat.getmemymap.domain.usecase.GetRegionsWithDownloadStateUseCase
 import com.opsat.getmemymap.domain.usecase.QueueDownloadUseCase
+import com.opsat.getmemymap.domain.usecase.QueueStopDownloadUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,15 +23,30 @@ import javax.inject.Inject
 class RegionViewModel @Inject constructor(
     private val getRegionListUseCase : GetRegionsWithDownloadStateUseCase,
     private val queueDownloadUseCase: QueueDownloadUseCase,
-    private val downloadRepository: DownloadRepository
+    private val queueStopDownloadUseCase: QueueStopDownloadUseCase,
 ): ViewModel() {
 
     private val selectedParentName = MutableStateFlow("europe")
 
-    val regions: StateFlow<List<RegionModel>> =
+    val regions: StateFlow<List<RegionUIItem>> =
         selectedParentName
             .flatMapLatest { parentRegion ->
-                getRegionListUseCase(parentRegion)
+                getRegionListUseCase(parentRegion).map { regionModelList ->
+                    regionModelList.map { regionModel ->
+                        val downloadProgress = ((regionModel.downloadedBytes.toDouble() / maxOf(regionModel.totalBytes, 1)) * 100).toInt()
+                        RegionUIItem(
+                            regionId = regionModel.regionId,
+                            regionName = regionModel.name,
+                            parentRegionName = regionModel.parentRegionName,
+                            hasChild = regionModel.hasChild,
+                            canDownload = !regionModel.hasChild,
+                            downloadProgress = downloadProgress,
+                            state = regionModel.state,
+                            downloadFileName = regionModel.downloadFileName
+                        )
+
+                    }
+                }
             }
             .stateIn(
                 scope = viewModelScope,
@@ -40,15 +57,15 @@ class RegionViewModel @Inject constructor(
         selectedParentName.value = parentName
     }
 
-    fun startDownloadMap(region : RegionModel) {
+    fun startDownloadMap(region : RegionUIItem) {
         viewModelScope.launch {
-            queueDownloadUseCase(region)
+            queueDownloadUseCase(region.regionId)
         }
     }
 
-    fun stopDownloadMap(region : RegionModel) {
+    fun stopDownloadMap(region : RegionUIItem) {
         viewModelScope.launch {
-            downloadRepository.stopDownloadMap(region)
+            queueStopDownloadUseCase(region.regionId)
         }
     }
 }

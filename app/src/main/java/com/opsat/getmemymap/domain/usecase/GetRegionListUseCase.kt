@@ -23,6 +23,7 @@ class GetRegionsWithDownloadStateUseCase @Inject constructor(
                         info.regionName == region.name
                     }
                     RegionModel(
+                        regionId = region.regionId,
                         region.name,
                         region.parentRegionName,
                         region.downloadFileName,
