@@ -6,6 +6,7 @@ import com.opsat.getmemymap.domain.model.RegionModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository
 import com.opsat.getmemymap.domain.repository.RegionRepository
 import com.opsat.getmemymap.domain.usecase.GetRegionsWithDownloadStateUseCase
+import com.opsat.getmemymap.domain.usecase.QueueDownloadUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegionViewModel @Inject constructor(
     private val getRegionListUseCase : GetRegionsWithDownloadStateUseCase,
+    private val queueDownloadUseCase: QueueDownloadUseCase,
     private val downloadRepository: DownloadRepository
 ): ViewModel() {
 
@@ -40,7 +42,7 @@ class RegionViewModel @Inject constructor(
 
     fun startDownloadMap(region : RegionModel) {
         viewModelScope.launch {
-            downloadRepository.addDownloadMap(region)
+            queueDownloadUseCase(region)
         }
     }
 

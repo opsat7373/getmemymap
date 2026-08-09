@@ -76,6 +76,11 @@ dependencies {
 
     ksp(libs.androidx.room.compiler)
 
+    implementation(libs.work.manager)
+
+    implementation(libs.hilt.work)
+    ksp(libs.hilt.work.compiler)
+
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
