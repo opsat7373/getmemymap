@@ -3,7 +3,9 @@ package com.opsat.getmemymap.data.local
 import com.opsat.getmemymap.data.local.database.DownloadDao
 import com.opsat.getmemymap.data.local.database.DownloadEntity
 import com.opsat.getmemymap.data.local.database.DbDownloadState
+import com.opsat.getmemymap.data.mapper.toDbEntity
 import com.opsat.getmemymap.data.mapper.toDomainModel
+import com.opsat.getmemymap.domain.model.DownloadState
 import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
 import com.opsat.getmemymap.domain.model.RegionModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository
@@ -56,4 +58,13 @@ class DownloadRepositoryImpl @Inject constructor(
             list.map { regionEntity -> regionEntity.toDomainModel()
         }
     }
+
+    override fun getEnqueuedDownloads(): Flow<List<RegionDownloadInfoModel>> =
+        downloadDao.getQueued().map { list ->
+            list.map { regionEntity -> regionEntity.toDomainModel()
+            }
+        }
+
+    override suspend fun updateDownload(downloadInfoModel: RegionDownloadInfoModel) =
+        downloadDao.update(downloadInfoModel.toDbEntity())
 }

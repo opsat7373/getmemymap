@@ -1,6 +1,10 @@
 package com.opsat.getmemymap.service
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
+import android.os.Environment
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
@@ -8,10 +12,13 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.opsat.getmemymap.R
 import com.opsat.getmemymap.data.local.database.DownloadEntity
+import com.opsat.getmemymap.domain.model.DownloadState
+import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -30,67 +37,88 @@ class DownloadWorker @AssistedInject constructor(
     workerParams
 ) {
 
-    override suspend fun doWork(): Result {
-        val a = 6
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-//        val downloadId =
-//            inputData.getString(DOWNLOAD_ID)
-//                ?: return Result.failure()
-//
-//        val download =
-//            repository.getDownload(downloadId)
-//                ?: return Result.failure()
-//
-//        setForeground(
-//            createForegroundInfo(
-//                download.fileName,
-//                0
-//            )
-//        )
-//
-//        return try {
-//
-//            repository.updateStatus(
-//                downloadId,
-//                DownloadStatus.DOWNLOADING
-//            )
-//
-//            downloadFile(download)
-//
-//            repository.updateStatus(
-//                downloadId,
-//                DownloadStatus.COMPLETED
-//            )
-//
-//            Result.success()
-//
-//        } catch (e: IOException) {
-//
-//            repository.updateStatus(
-//                downloadId,
-//                DownloadStatus.FAILED
-//            )
-//
-//            Result.retry()
-//
-//        } catch (e: Exception) {
-//
-//            repository.updateStatus(
-//                downloadId,
-//                DownloadStatus.FAILED
-//            )
-//
-//            Result.failure()
-//        }
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Downloads",
+                NotificationManager.IMPORTANCE_LOW
+            )
+
+            val manager =
+                applicationContext.getSystemService(
+                    NotificationManager::class.java
+                )
+
+            manager.createNotificationChannel(channel)
+        }
+    }
+
+    override suspend fun doWork(): Result {
+        createNotificationChannel()
+        val downloadId =
+            inputData.getString(DOWNLOAD_ID)
+                ?: return Result.failure()
+
+        val downloadModelList =
+            repository.getEnqueuedDownloads().first()
+        downloadModelList.forEach { downloadInfoModel ->
+
+            setForeground(
+                createForegroundInfo(
+                    downloadInfoModel.regionName,
+                    0
+                )
+            )
+
+            try {
+
+                repository.updateDownload(
+                    downloadInfoModel.copy(
+                        state = DownloadState.DOWNLOADING
+                    )
+                )
+
+                downloadFile(downloadInfoModel)
+
+                repository.updateDownload(
+                    downloadInfoModel.copy(
+                        state = DownloadState.COMPLETED
+                    )
+                )
+
+            } catch (e: IOException) {
+
+                repository.updateDownload(
+                    downloadInfoModel.copy(
+                        state = DownloadState.FAILED
+                    )
+                )
+
+                return Result.retry()
+
+            } catch (e: Exception) {
+
+                repository.updateDownload(
+                    downloadInfoModel.copy(
+                        state = DownloadState.FAILED
+                    )
+                )
+
+                return Result.failure()
+            }
+
+        }
         return Result.success()
     }
 
     private suspend fun downloadFile(
-        download: DownloadEntity
+        downloadModel: RegionDownloadInfoModel
     ) = withContext(Dispatchers.IO) {
 
         val request = Request.Builder()
-            .url(download.downloadUrl)
+            .url("https://download.osmand.net/download.php?standard=yes&file=${downloadModel.downloadUrl}")
             .build()
 
         okHttpClient
@@ -114,8 +142,9 @@ class DownloadWorker @AssistedInject constructor(
                         "Unknown content length"
                     )
                 }
+                val directory = applicationContext.filesDir
 
-                val file = File(download.localFile)
+                val file = File(directory,downloadModel.localFile)
 
                 file.parentFile?.mkdirs()
 
@@ -152,21 +181,22 @@ class DownloadWorker @AssistedInject constructor(
 
                                 lastProgress = progress
 
-                                /*repository.updateProgress(
-                                    id = download.id,
-                                    progress = progress,
-                                    downloadedBytes = downloadedBytes,
-                                    totalBytes = totalBytes
+                                repository.updateDownload(
+                                    downloadModel.copy(
+                                        downloadedBytes = downloadedBytes,
+                                        totalBytes = totalBytes
+                                    )
+
                                 )
 
                                 setForeground(
                                     createForegroundInfo(
-                                        download.fileName,
+                                        downloadModel.regionName,
                                         progress
                                     )
                                 )
 
-                                 */
+
                             }
                         }
 

@@ -54,7 +54,7 @@ class MyRegionRecyclerViewAdapter(val onCancelClick : (RegionModel) -> Unit = {}
         )
 
         val progress = ((item.downloadedBytes.toDouble() / maxOf(item.totalBytes, 1)) * 100).toInt()
-        holder.progressBar.setProgress(progress, true)
+        holder.progressBar.setProgress(progress, false)
         holder.root.setOnClickListener {
             onItemClick(item)
         }

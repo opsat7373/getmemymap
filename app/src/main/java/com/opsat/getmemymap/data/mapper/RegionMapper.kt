@@ -26,6 +26,18 @@ fun DownloadEntity.toDomainModel() =
         totalBytes = totalBytes
     )
 
+fun RegionDownloadInfoModel.toDbEntity() =
+    DownloadEntity (
+        regionName = regionName,
+        parentRegionName = parentRegionName,
+        downloadUrl = downloadUrl ?: "",
+        localFile = localFile ?: "",
+        queuePosition = queuePosition,
+        state = state.toDbEntity(),
+        downloadedBytes = downloadedBytes,
+        totalBytes = totalBytes
+    )
+
 fun DbDownloadState.toDomain() =
     when (this) {
         DbDownloadState.QUEUED -> DownloadState.QUEUED
@@ -34,3 +46,12 @@ fun DbDownloadState.toDomain() =
         DbDownloadState.COMPLETED -> DownloadState.COMPLETED
         DbDownloadState.FAILED -> DownloadState.FAILED
 }
+
+fun DownloadState.toDbEntity() =
+    when (this) {
+        DownloadState.QUEUED -> DbDownloadState.QUEUED
+        DownloadState.DOWNLOADING -> DbDownloadState.DOWNLOADING
+        DownloadState.UNKNOWN -> DbDownloadState.UNKNOWN
+        DownloadState.COMPLETED -> DbDownloadState.COMPLETED
+        DownloadState.FAILED -> DbDownloadState.FAILED
+    }
