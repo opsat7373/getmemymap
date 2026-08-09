@@ -62,8 +62,9 @@ interface DownloadDao {
         FROM downloads
         WHERE state = 'QUEUED'
         ORDER BY queuePosition
+        LIMIT 1
     """)
-    fun getQueued(): Flow<List<DownloadEntity>>
+    fun getQueued(): DownloadEntity?
 
     @Query("""
         SELECT *

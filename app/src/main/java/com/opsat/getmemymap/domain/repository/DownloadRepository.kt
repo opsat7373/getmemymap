@@ -14,7 +14,7 @@ interface DownloadRepository {
 
     fun getRegionDownloadInfo(parentRegionName : String?) : Flow<List<RegionDownloadInfoModel>>
 
-    fun getEnqueuedDownloads() : Flow<List<RegionDownloadInfoModel>>
+    fun getEnqueuedDownloads() : RegionDownloadInfoModel?
 
     suspend fun updateDownload(downloadInfoModel: RegionDownloadInfoModel)
 

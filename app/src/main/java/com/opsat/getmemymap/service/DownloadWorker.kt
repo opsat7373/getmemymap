@@ -55,59 +55,53 @@ class DownloadWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         createNotificationChannel()
-        val downloadId =
-            inputData.getString(DOWNLOAD_ID)
-                ?: return Result.failure()
 
-        val downloadModelList =
-            repository.getEnqueuedDownloads().first()
-        downloadModelList.forEach { downloadInfoModel ->
+        do {
+            val downloadInfoModel =
+                repository.getEnqueuedDownloads()
+            if (downloadInfoModel  != null) {
 
-            setForeground(
-                createForegroundInfo(
-                    downloadInfoModel.regionName,
-                    0
-                )
-            )
-
-            try {
-
-                repository.updateDownload(
-                    downloadInfoModel.copy(
-                        state = DownloadState.DOWNLOADING
+                setForeground(
+                    createForegroundInfo(
+                        downloadInfoModel.regionName,
+                        0
                     )
                 )
+                try {
 
-                downloadFile(downloadInfoModel)
-
-                repository.updateDownload(
-                    downloadInfoModel.copy(
-                        state = DownloadState.COMPLETED
+                    repository.updateDownload(
+                        downloadInfoModel.copy(
+                            state = DownloadState.DOWNLOADING
+                        )
                     )
-                )
+                    downloadFile(downloadInfoModel)
 
-            } catch (e: IOException) {
-
-                repository.updateDownload(
-                    downloadInfoModel.copy(
-                        state = DownloadState.FAILED
+                    repository.updateDownload(
+                        downloadInfoModel.copy(
+                            state = DownloadState.COMPLETED
+                        )
                     )
-                )
+                } catch (e: IOException) {
 
-                return Result.retry()
-
-            } catch (e: Exception) {
-
-                repository.updateDownload(
-                    downloadInfoModel.copy(
-                        state = DownloadState.FAILED
+                    repository.updateDownload(
+                        downloadInfoModel.copy(
+                            state = DownloadState.FAILED
+                        )
                     )
-                )
+                    return Result.retry()
 
-                return Result.failure()
+                } catch (e: Exception) {
+
+                    repository.updateDownload(
+                        downloadInfoModel.copy(
+                            state = DownloadState.FAILED
+                        )
+                    )
+                    return Result.failure()
+                }
             }
 
-        }
+        } while (downloadInfoModel != null)
         return Result.success()
     }
 

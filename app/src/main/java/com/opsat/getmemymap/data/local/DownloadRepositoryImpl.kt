@@ -61,11 +61,8 @@ class DownloadRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getEnqueuedDownloads(): Flow<List<RegionDownloadInfoModel>> =
-        downloadDao.getQueued().map { list ->
-            list.map { regionEntity -> regionEntity.toDomainModel()
-            }
-        }
+    override fun getEnqueuedDownloads(): RegionDownloadInfoModel? =
+        downloadDao.getQueued()?.toDomainModel()
 
     override suspend fun updateDownload(downloadInfoModel: RegionDownloadInfoModel) =
         downloadDao.update(downloadInfoModel.toDbEntity())
