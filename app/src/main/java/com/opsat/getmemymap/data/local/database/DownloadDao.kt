@@ -41,6 +41,13 @@ interface DownloadDao {
     fun observeQueue(): Flow<List<DownloadEntity>>
 
     @Query("""
+        UPDATE downloads
+        SET state = :state
+        WHERE regionId = :regionId
+    """)
+    fun updateState(regionId: String, state: String)
+
+    @Query("""
         SELECT *
         FROM downloads
         WHERE state = 'DOWNLOADING'
@@ -60,7 +67,7 @@ interface DownloadDao {
     @Query("""
         SELECT *
         FROM downloads
-        WHERE state = 'QUEUED'
+        WHERE state = 'QUEUED' OR state = 'DOWNLOADING'
         ORDER BY queuePosition
         LIMIT 1
     """)

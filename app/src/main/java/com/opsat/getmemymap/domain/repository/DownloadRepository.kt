@@ -3,7 +3,6 @@ package com.opsat.getmemymap.domain.repository
 import com.opsat.getmemymap.domain.model.DownloadState
 import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
 import com.opsat.getmemymap.domain.model.RegionInfoModel
-import com.opsat.getmemymap.domain.model.RegionModel
 import kotlinx.coroutines.flow.Flow
 
 interface DownloadRepository {
@@ -16,6 +15,8 @@ interface DownloadRepository {
 
     fun getEnqueuedDownloads() : RegionDownloadInfoModel?
 
-    suspend fun updateDownload(downloadInfoModel: RegionDownloadInfoModel)
+    suspend fun update(downloadInfoModel : RegionDownloadInfoModel)
+
+    fun updateState(regionId : String, state : DownloadState)
 
 }

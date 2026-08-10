@@ -65,11 +65,7 @@ class DownloadWorker @AssistedInject constructor(
                     )
                 )
                 try {
-                    repository.updateDownload(
-                        downloadInfoModel.copy(
-                            state = DownloadState.DOWNLOADING
-                        )
-                    )
+                    repository.updateState( downloadInfoModel.regionId, DownloadState.DOWNLOADING)
                     val url = "https://download.osmand.net/download.php?standard=yes&file=${downloadInfoModel.downloadUrl}"
                     val directory = applicationContext.filesDir
 
@@ -79,16 +75,25 @@ class DownloadWorker @AssistedInject constructor(
 
                     val file = File(directory, partFileName)
 
-                    file.delete()
+                    val downloadedBytes = if (downloadInfoModel.state == DownloadState.DOWNLOADING && file.exists()) {
+                        file.length()
+                    } else 0L
 
                     val downloadFlow = downloadController.download(
                         url,
                         downloadInfoModel.regionId,
-                        file
+                        file,
+                        downloadedBytes = downloadedBytes
                     )
 
                     downloadFlow.collect { downloadResult ->
                         when(downloadResult) {
+                            DownloadResult.Success -> {
+                                file.renameTo(
+                                    File(file.parentFile, destinationFileName)
+                                )
+                                repository.updateState( downloadInfoModel.regionId, DownloadState.COMPLETED)
+                            }
                             DownloadResult.Cancelled -> {
                                 file.delete()
                             }
@@ -97,7 +102,7 @@ class DownloadWorker @AssistedInject constructor(
                                     ((downloadResult.downloadedBytes * 100) / downloadResult.totalBytes)
                                         .toInt()
 
-                                repository.updateDownload(
+                                repository.update(
                                     downloadInfoModel.copy(
                                         state = DownloadState.DOWNLOADING,
                                         downloadedBytes = downloadResult.downloadedBytes,
@@ -114,47 +119,18 @@ class DownloadWorker @AssistedInject constructor(
                                 )
                             }
 
-                            is DownloadResult.Error -> repository.updateDownload(
-                                downloadInfoModel.copy(
-                                    state = DownloadState.FAILED
-                                )
-                            )
-                            DownloadResult.Success -> {
-
-                                file.renameTo(
-                                    File(file.parentFile, destinationFileName)
-                                )
-
-                                repository.updateDownload(
-                                    downloadInfoModel.copy(
-                                        state = DownloadState.COMPLETED
-                                    )
-                                )
-                            }
+                            is DownloadResult.Error -> repository.updateState( downloadInfoModel.regionId, DownloadState.FAILED )
                         }
                     }
 
 
                 } catch (e: IOException) {
-                    if (currentCall?.isCanceled() == true ) {
-                        val a = 5
-                    } else {
+                    repository.updateState( downloadInfoModel.regionId, DownloadState.FAILED )
 
-                        repository.updateDownload(
-                            downloadInfoModel.copy(
-                                state = DownloadState.FAILED
-                            )
-                        )
-                        return Result.retry()
-                    }
-
+                    return Result.retry()
                 } catch (e: Exception) {
+                    repository.updateState( downloadInfoModel.regionId, DownloadState.FAILED )
 
-                    repository.updateDownload(
-                        downloadInfoModel.copy(
-                            state = DownloadState.FAILED
-                        )
-                    )
                     return Result.failure()
                 }
             }

@@ -1,13 +1,8 @@
 package com.opsat.getmemymap.data.downloader
 
-import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -17,15 +12,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
-import kotlin.compareTo
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.text.toInt
 
 class DownloadController @Inject constructor(
     private val client: OkHttpClient
 ) {
-
     private var currentCall: Call? = null
 
     private var currentRegionId: String? = null
@@ -33,10 +23,12 @@ class DownloadController @Inject constructor(
     fun download(
         url: String,
         regionId: String,
-        outputFile: File
+        outputFile: File,
+        downloadedBytes : Long = 0,
     ): Flow<DownloadResult> = callbackFlow {
         val request = Request.Builder()
             .url(url)
+            .header("Range", "bytes=$downloadedBytes-")
             .build()
 
         val call = client.newCall(request)
@@ -67,7 +59,7 @@ class DownloadController @Inject constructor(
                 ) {
                     val body = response.body
 
-                    val totalBytes = body.contentLength()
+                    val totalBytes = getTotalBytes(response)
 
                     if (totalBytes <= 0) {
                         throw IOException(
@@ -77,25 +69,24 @@ class DownloadController @Inject constructor(
 
                     outputFile.parentFile?.mkdirs()
 
+                    val append = downloadedBytes != 0L
+
                     try {
 
                         body.byteStream().use { input ->
 
-                            FileOutputStream(outputFile).use { output ->
+                            FileOutputStream(outputFile, append).use { output ->
 
                                 val buffer = ByteArray(8 * 1024)
 
-                                var downloadedBytes = 0L
+                                var downloadedBytes = downloadedBytes
                                 var lastProgress = -1
 
                                 while (true) {
-
                                     val read = input.read(buffer)
-
                                     if (read == -1) {
                                         break
                                     }
-
                                     output.write(
                                         buffer,
                                         0,
@@ -118,7 +109,6 @@ class DownloadController @Inject constructor(
                                                 totalBytes
                                             )
                                         trySend(progress)
-
                                     }
                                 }
 
@@ -145,6 +135,17 @@ class DownloadController @Inject constructor(
             currentCall = null
             currentRegionId = null
         }
+    }
+
+    fun getTotalBytes(response: Response): Long {
+        val contentRange = response.header("Content-Range")
+
+        if (contentRange != null) {
+            return contentRange.substringAfter("/")
+                .toLong()
+        }
+
+        return response.body.contentLength()
     }
 
     fun cancel(regionId : String) {
