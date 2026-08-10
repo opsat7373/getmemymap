@@ -36,9 +36,19 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"https://download.osmand.net/\""
+            )
         }
         debug {
             isDebuggable = true
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"https://download.osmand.net/\""
+            )
         }
     }
     compileOptions {
@@ -48,6 +58,7 @@ android {
     buildFeatures {
         viewBinding = true
         dataBinding = true
+        buildConfig = true
     }
 }
 
@@ -83,6 +94,7 @@ dependencies {
 
     implementation(libs.hilt.work)
     ksp(libs.hilt.work.compiler)
+    implementation(libs.timber)
 
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)

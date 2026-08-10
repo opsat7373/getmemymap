@@ -3,12 +3,12 @@ package com.opsat.getmemymap.service
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import com.opsat.getmemymap.BuildConfig
 import com.opsat.getmemymap.R
 import com.opsat.getmemymap.data.downloader.DownloadController
 import com.opsat.getmemymap.data.downloader.DownloadResult
@@ -16,7 +16,7 @@ import com.opsat.getmemymap.domain.model.DownloadState
 import com.opsat.getmemymap.domain.repository.DownloadRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import okhttp3.Call
+import timber.log.Timber
 import java.io.File
 import java.io.IOException
 
@@ -31,24 +31,19 @@ class DownloadWorker @AssistedInject constructor(
     workerParams
 ) {
 
-    private var currentCall: Call? = null
-
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            "Downloads",
+            NotificationManager.IMPORTANCE_LOW
+        )
 
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Downloads",
-                NotificationManager.IMPORTANCE_LOW
+        val manager =
+            applicationContext.getSystemService(
+                NotificationManager::class.java
             )
 
-            val manager =
-                applicationContext.getSystemService(
-                    NotificationManager::class.java
-                )
-
-            manager.createNotificationChannel(channel)
-        }
+        manager.createNotificationChannel(channel)
     }
 
     override suspend fun doWork(): Result {
@@ -66,7 +61,7 @@ class DownloadWorker @AssistedInject constructor(
                 )
                 try {
                     repository.updateState( downloadInfoModel.regionId, DownloadState.DOWNLOADING)
-                    val url = "https://download.osmand.net/download.php?standard=yes&file=${downloadInfoModel.downloadUrl}"
+                    val url = "${BuildConfig.BASE_URL}/download.php?standard=yes&file=${downloadInfoModel.downloadUrl}"
                     val directory = applicationContext.filesDir
 
                     val partFileName = "${downloadInfoModel.localFile}_part"
@@ -125,10 +120,12 @@ class DownloadWorker @AssistedInject constructor(
 
 
                 } catch (e: IOException) {
+                    Timber.e(e)
                     repository.updateState( downloadInfoModel.regionId, DownloadState.SUSPENDED )
 
                     return Result.retry()
                 } catch (e: Exception) {
+                    Timber.e(e)
                     repository.updateState( downloadInfoModel.regionId, DownloadState.SUSPENDED )
 
                     return Result.failure()
