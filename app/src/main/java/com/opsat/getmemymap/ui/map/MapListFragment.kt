@@ -54,7 +54,7 @@ class MapListFragment : Fragment() {
         if (map.hasChild) {
             findNavController().navigate(
                 MapListFragmentDirections
-                    .actionMapFragmentSelf(map.mapName)
+                    .actionMapFragmentSelf(map.mapName, map.mapTranslatedName)
             )
             return
         }
@@ -143,9 +143,10 @@ class MapListFragment : Fragment() {
         binding.list.layoutManager = LinearLayoutManager(context)
         binding.list.adapter = adapter
         val mapName = args.parentMapName
+        val mapTranslatedName = args.parentMapTranslation
         (requireActivity() as AppCompatActivity)
             .supportActionBar
-            ?.title = if (mapName == "europe") getString(R.string.downloads_map_title) else mapName.replaceFirstChar { it.uppercase() }
+            ?.title = if (mapName == "europe") getString(R.string.downloads_map_title) else mapTranslatedName.replaceFirstChar { it.uppercase() }
         binding.memoryMonitorContainer.visibility = if(args.showMemoryInfo) View.VISIBLE else View.GONE
         binding.europeLabel.visibility = if(args.showMemoryInfo) View.VISIBLE else View.GONE
         observeMaps()

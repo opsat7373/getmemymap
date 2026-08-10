@@ -16,6 +16,11 @@
             app:nullable="false"
             android:defaultValue="europe"/>
         <argument
+            android:name="parentMapTranslation"
+            app:argType="string"
+            app:nullable="false"
+            android:defaultValue="Europe"/>
+        <argument
             android:name="showMemoryInfo"
             app:argType="boolean"
             android:defaultValue="true"/>
@@ -24,6 +29,10 @@
             app:destination="@id/mapListFragment">
             <argument
                 android:name="parentMapName"
+                app:nullable="false"
+                android:defaultValue=""/>
+            <argument
+                android:name="parentMapTranslation"
                 app:nullable="false"
                 android:defaultValue=""/>
             <argument
