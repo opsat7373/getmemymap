@@ -30,8 +30,11 @@ interface DownloadDao {
     @Update
     suspend fun update(download: DownloadEntity)
 
-    @Delete
-    suspend fun delete(download: DownloadEntity)
+    @Query("""
+        DELETE FROM downloads
+        WHERE regionId = :regionId
+    """)
+    suspend fun delete(regionId: String)
 
     @Query("""
         SELECT *
@@ -67,7 +70,7 @@ interface DownloadDao {
     @Query("""
         SELECT *
         FROM downloads
-        WHERE state = 'QUEUED' OR state = 'DOWNLOADING'
+        WHERE state = 'QUEUED' OR state = 'DOWNLOADING' OR state = 'SUSPENDED'
         ORDER BY queuePosition
         LIMIT 1
     """)

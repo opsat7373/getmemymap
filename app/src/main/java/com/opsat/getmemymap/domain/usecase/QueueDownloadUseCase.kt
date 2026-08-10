@@ -13,14 +13,15 @@ class QueueDownloadUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(
-        regionId: String
+        regionId: String,
+        allowMobileData: Boolean
     ) {
         val region = regionRepository.getRegionById(regionId)
         downloadRepository.addDownloadMap(region)
 
         val downloadFileName = region.downloadFileName
         if (downloadFileName != null) {
-            scheduler.schedule(downloadFileName)
+            scheduler.schedule(downloadFileName, allowMobileData)
         }
     }
 }

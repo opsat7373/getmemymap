@@ -28,9 +28,8 @@ class GetRegionsWithDownloadStateUseCase @Inject constructor(
                         region.parentRegionName,
                         region.downloadFileName,
                         hasChild = region.hasChild,
-                        downloadInfo?.state ?: DownloadState.UNKNOWN,
-                        downloadedBytes = downloadInfo?.downloadedBytes ?: 0L,
-                        totalBytes = downloadInfo?.totalBytes ?: 0L
+                        canDownload = region.hasChild,
+                        downloadInfo = downloadInfo
                     )
                 }
         }

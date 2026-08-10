@@ -6,6 +6,6 @@ data class RegionModel (
     val parentRegionName: String,
     val downloadFileName: String? = null,
     val hasChild: Boolean,
-    val state: DownloadState,
-    val downloadedBytes: Long,
-    val totalBytes: Long)
+    val canDownload: Boolean,
+    val downloadInfo: RegionDownloadInfoModel? = null
+)

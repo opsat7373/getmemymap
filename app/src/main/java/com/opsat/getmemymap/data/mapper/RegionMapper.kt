@@ -45,7 +45,7 @@ fun DbDownloadState.toDomain() =
     when (this) {
         DbDownloadState.QUEUED -> DownloadState.QUEUED
         DbDownloadState.DOWNLOADING -> DownloadState.DOWNLOADING
-        DbDownloadState.UNKNOWN -> DownloadState.UNKNOWN
+        DbDownloadState.SUSPENDED -> DownloadState.SUSPENDED
         DbDownloadState.COMPLETED -> DownloadState.COMPLETED
         DbDownloadState.FAILED -> DownloadState.FAILED
 }
@@ -54,7 +54,7 @@ fun DownloadState.toDbEntity() =
     when (this) {
         DownloadState.QUEUED -> DbDownloadState.QUEUED
         DownloadState.DOWNLOADING -> DbDownloadState.DOWNLOADING
-        DownloadState.UNKNOWN -> DbDownloadState.UNKNOWN
+        DownloadState.SUSPENDED -> DbDownloadState.SUSPENDED
         DownloadState.COMPLETED -> DbDownloadState.COMPLETED
         DownloadState.FAILED -> DbDownloadState.FAILED
     }

@@ -75,7 +75,7 @@ class DownloadWorker @AssistedInject constructor(
 
                     val file = File(directory, partFileName)
 
-                    val downloadedBytes = if (downloadInfoModel.state == DownloadState.DOWNLOADING && file.exists()) {
+                    val downloadedBytes = if ((downloadInfoModel.state == DownloadState.DOWNLOADING || downloadInfoModel.state == DownloadState.SUSPENDED) && file.exists()) {
                         file.length()
                     } else 0L
 
@@ -119,17 +119,17 @@ class DownloadWorker @AssistedInject constructor(
                                 )
                             }
 
-                            is DownloadResult.Error -> repository.updateState( downloadInfoModel.regionId, DownloadState.FAILED )
+                            is DownloadResult.Error -> repository.updateState( downloadInfoModel.regionId, DownloadState.SUSPENDED )
                         }
                     }
 
 
                 } catch (e: IOException) {
-                    repository.updateState( downloadInfoModel.regionId, DownloadState.FAILED )
+                    repository.updateState( downloadInfoModel.regionId, DownloadState.SUSPENDED )
 
                     return Result.retry()
                 } catch (e: Exception) {
-                    repository.updateState( downloadInfoModel.regionId, DownloadState.FAILED )
+                    repository.updateState( downloadInfoModel.regionId, DownloadState.SUSPENDED )
 
                     return Result.failure()
                 }

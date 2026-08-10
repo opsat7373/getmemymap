@@ -2,5 +2,5 @@ package com.opsat.getmemymap.domain.repository
 
 interface DownloadScheduler {
 
-    fun schedule(regionId: String)
+    fun schedule(regionId: String, allowMobileData: Boolean)
 }

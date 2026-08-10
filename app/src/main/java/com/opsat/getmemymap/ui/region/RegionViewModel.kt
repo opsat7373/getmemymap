@@ -33,15 +33,21 @@ class RegionViewModel @Inject constructor(
             .flatMapLatest { parentRegion ->
                 getRegionListUseCase(parentRegion).map { regionModelList ->
                     regionModelList.map { regionModel ->
-                        val downloadProgress = ((regionModel.downloadedBytes.toDouble() / maxOf(regionModel.totalBytes, 1)) * 100).toInt()
+                        val downloadInfo = regionModel.downloadInfo
+                        val downloadProgress = if (downloadInfo != null) {
+                                ((downloadInfo.downloadedBytes.toDouble() / maxOf(
+                                    downloadInfo.totalBytes,
+                                    1
+                                )) * 100).toInt()
+                        } else 0
                         RegionUIItem(
                             regionId = regionModel.regionId,
                             regionName = regionModel.name,
                             parentRegionName = regionModel.parentRegionName,
                             hasChild = regionModel.hasChild,
-                            canDownload = !regionModel.hasChild,
+                            canDownload = !regionModel.hasChild && downloadInfo?.state == null,
                             downloadProgress = downloadProgress,
-                            state = regionModel.state,
+                            state = regionModel.downloadInfo?.state,
                             downloadFileName = regionModel.downloadFileName
                         )
 
@@ -57,9 +63,9 @@ class RegionViewModel @Inject constructor(
         selectedParentName.value = parentName
     }
 
-    fun startDownloadMap(region : RegionUIItem) {
+    fun startDownloadMap(regionId : String, allowMobileData : Boolean) {
         viewModelScope.launch {
-            queueDownloadUseCase(region.regionId)
+            queueDownloadUseCase(regionId, allowMobileData)
         }
     }
 

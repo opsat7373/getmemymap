@@ -38,22 +38,7 @@ class DownloadRepositoryImpl @Inject constructor(
     }
 
     override suspend fun stopDownloadMap(region: RegionInfoModel) {
-        val downloadFileName = region.downloadFileName
-        if (downloadFileName != null) {
-            val downloadEntity = DownloadEntity(
-                region.regionId,
-                region.parentRegionName,
-                region.name,
-                downloadFileName,
-                downloadFileName,
-                -1,
-                DbDownloadState.UNKNOWN,
-                -1,
-                -1
-
-            )
-            downloadDao.delete(downloadEntity)
-        }
+        downloadDao.delete(region.regionId)
     }
 
     override fun getRegionDownloadInfo(parentRegionName: String?): Flow<List<RegionDownloadInfoModel>> =

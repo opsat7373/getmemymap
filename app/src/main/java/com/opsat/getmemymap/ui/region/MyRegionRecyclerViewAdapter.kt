@@ -34,9 +34,9 @@ class MyRegionRecyclerViewAdapter(val onCancelClick : (RegionUIItem) -> Unit = {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        val downloadStarted = item.state == DownloadState.DOWNLOADING || item.state == DownloadState.QUEUED
+        val downloadStarted = item.state == DownloadState.DOWNLOADING || item.state == DownloadState.QUEUED || item.state == DownloadState.SUSPENDED
         holder.contentView.text = item.regionName
-        holder.downloadButton.visibility = if (!item.hasChild && item.state == DownloadState.UNKNOWN) View.VISIBLE else View.INVISIBLE
+        holder.downloadButton.visibility = if (item.canDownload) View.VISIBLE else View.INVISIBLE
         holder.cancelButton.visibility = if (downloadStarted) View.VISIBLE else View.INVISIBLE
         holder.progressBar.visibility = if (downloadStarted) View.VISIBLE else View.GONE
 

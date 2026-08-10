@@ -9,6 +9,6 @@ data class RegionUIItem (
     val hasChild: Boolean,
     val canDownload : Boolean,
     val downloadProgress : Int,
-    val state : DownloadState,
+    val state : DownloadState?,
     val downloadFileName: String?
 )

@@ -13,7 +13,7 @@ class WorkManagerDownloadScheduler @Inject constructor(
     private val workManager: WorkManager
 ) : DownloadScheduler {
 
-    override fun schedule(downloadId: String) {
+    override fun schedule(downloadId: String, allowMobileData: Boolean) {
 
         val request =
             OneTimeWorkRequestBuilder<DownloadWorker>()
@@ -22,19 +22,19 @@ class WorkManagerDownloadScheduler @Inject constructor(
                         DownloadWorker.DOWNLOAD_ID to downloadId
                     )
                 )
-//                .setConstraints(
-//                    Constraints.Builder()
-//                        .setRequiredNetworkType(
-//                            NetworkType.CONNECTED,
-//                        )
-//                        .build()
-//                )
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(
+                            if (allowMobileData) NetworkType.CONNECTED else NetworkType.UNMETERED,
+                        )
+                        .build()
+                )
                 .build()
 
         workManager
             .beginUniqueWork(
                 DOWNLOAD_QUEUE,
-                ExistingWorkPolicy.APPEND_OR_REPLACE,
+                ExistingWorkPolicy.REPLACE,
                 request
             )
             .enqueue()
