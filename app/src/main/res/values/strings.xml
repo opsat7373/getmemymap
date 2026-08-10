@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Get Me My Map</string>
     <string name="notification_download_label">Downloads</string>
+    <string name="not_connection_dialog_title">No Connection</string>
+    <string name="no_connection_dialog_message">An Internet connection is required for downloading.</string>
+    <string name="wi_fi_dialog_title">Wi-Fi Required</string>
+    <string name="wwi_fi_dialog_message">"You have disabled the use of mobile data. The download will continue when Wi-Fi is available."</string>
+    <string name="cell_data_dialog_title">Mobile Data</string>
+    <string name="cell_data_dialog_message">"Wi-Fi is unavailable. Use mobile data for downloading?"</string>
+    <string name="downloads_map_title">Downloads Map</string>
 </resources>

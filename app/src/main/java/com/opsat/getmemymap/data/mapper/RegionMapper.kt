@@ -8,10 +8,10 @@ import com.opsat.getmemymap.domain.model.MapDownloadingInfoModel
 import com.opsat.getmemymap.domain.model.MapInfoModel
 
 fun MapXml.toDomainModel() = MapInfoModel(
-    regionId = "${parentRegionName}_${name}",
+    mapId = "${parentMapName}_${name}",
     name = name,
     translate = translate,
-    parentRegionName = parentRegionName,
+    parentMapId = parentMapName,
     downloadFileName = "${downloadPrefix}${name}_europe_2.obf.zip".replaceFirstChar { it.uppercase() },
     hasChild = hasChild,
     downloadAvailable = downloadAvailable
@@ -19,9 +19,9 @@ fun MapXml.toDomainModel() = MapInfoModel(
 
 fun DownloadEntity.toDomainModel() =
     MapDownloadingInfoModel(
-        regionId = "${parentRegionName}_${regionName}",
-        regionName = regionName,
-        parentRegionName = parentRegionName,
+        mapId = "${parentMapId}_${mapName}",
+        mapName = mapName,
+        parentMapName = parentMapId,
         downloadUrl = downloadUrl,
         localFile = localFile,
         queuePosition = queuePosition,
@@ -32,9 +32,9 @@ fun DownloadEntity.toDomainModel() =
 
 fun MapDownloadingInfoModel.toDbEntity() =
     DownloadEntity (
-        regionId = "${parentRegionName}_${regionName}",
-        regionName = regionName,
-        parentRegionName = parentRegionName,
+        mapId = "${parentMapName}_${mapName}",
+        mapName = mapName,
+        parentMapId = parentMapName,
         downloadUrl = downloadUrl ?: "",
         localFile = localFile ?: "",
         queuePosition = queuePosition,

@@ -31,24 +31,24 @@ interface DownloadDao {
 
     @Query("""
         DELETE FROM downloads
-        WHERE regionId = :regionId
+        WHERE mapId = :mapId
     """)
-    suspend fun delete(regionId: String)
+    suspend fun delete(mapId: String)
 
     @Query("""
         UPDATE downloads
         SET state = :state
-        WHERE regionId = :regionId
+        WHERE mapId = :mapId
     """)
-    fun updateState(regionId: String, state: String)
+    fun updateState(mapId: String, state: String)
 
     @Query("""
         SELECT *
         FROM downloads
-        WHERE parentRegionName = :name
+        WHERE parentMapId = :parentMapId
     """)
-    fun observeRegionsByParentName(
-        name: String?
+    fun observeMapsByParentName(
+        parentMapId: String?
     ): Flow<List<DownloadEntity>>
 
     @Query("""

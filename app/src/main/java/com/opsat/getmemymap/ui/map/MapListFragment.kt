@@ -1,4 +1,4 @@
-package com.opsat.getmemymap.ui.region
+package com.opsat.getmemymap.ui.map
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -16,8 +16,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.opsat.getmemymap.R
 import com.opsat.getmemymap.data.network.NetworkChecker
-import com.opsat.getmemymap.databinding.RegionItemListBinding
+import com.opsat.getmemymap.databinding.MapItemListBinding
 import com.opsat.getmemymap.ui.NetworkPolicy
 import com.opsat.getmemymap.ui.SessionViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,46 +29,62 @@ import javax.inject.Inject
  * A fragment representing a list of Items.
  */
 @AndroidEntryPoint
-class RegionFragment : Fragment() {
+class MapListFragment : Fragment() {
 
-    private lateinit var binding: RegionItemListBinding
+    private lateinit var binding: MapItemListBinding
 
     @Inject
     lateinit var networkChecker: NetworkChecker
 
-    val regionViewModel : RegionViewModel by viewModels()
+    val mapListViewModel : MapListViewModel by viewModels()
 
     private val sessionViewModel: SessionViewModel by activityViewModels()
 
-    val args: RegionFragmentArgs by navArgs()
+    val args: MapListFragmentArgs by navArgs()
 
-    val adapter = MyRegionRecyclerViewAdapter({region -> regionViewModel.stopDownloadMap(region)}) { regionItem ->
-        if (regionItem.hasChild) {
-            findNavController().navigate(RegionFragmentDirections.actionRegionFragmentSelf(regionItem.regionName))
-        } else {
-            when {
-                networkChecker.isWifiConnected() -> {
-                    regionViewModel.startDownloadMap(regionItem.regionId, allowMobileData = false)
-                }
+    private val adapter by lazy {
+        MapListRecyclerViewAdapter(
+            onCancelClick = mapListViewModel::stopDownloadMap,
+            onDownloadClick = ::handleDownload,
+            onItemClick = ::onMapItemClicked
+        )
+    }
 
-                networkChecker.isMobileDataConnected() -> {
-                    handleMobileNetwork(regionItem.regionId)
-                }
-
-                else -> {
-                    showNoInternetMessage()
-                }
-            }
-
+    private fun onMapItemClicked(map: MapUIItem) {
+        if (map.hasChild) {
+            findNavController().navigate(
+                MapListFragmentDirections
+                    .actionMapFragmentSelf(map.mapName)
+            )
+            return
         }
     }
 
-    private fun handleMobileNetwork(regionId : String) {
+    private fun handleDownload(map: MapUIItem) {
+        when {
+            networkChecker.isWifiConnected() -> {
+                mapListViewModel.startDownloadMap(
+                    mapId = map.mapId,
+                    allowMobileData = false
+                )
+            }
+
+            networkChecker.isMobileDataConnected() -> {
+                handleMobileNetwork(map.mapId)
+            }
+
+            else -> {
+                showNoInternetMessage()
+            }
+        }
+    }
+
+    private fun handleMobileNetwork(mapId : String) {
 
         when (sessionViewModel.networkPolicy) {
 
             NetworkPolicy.ANY_NETWORK -> {
-                regionViewModel.startDownloadMap(regionId, allowMobileData = true)
+                mapListViewModel.startDownloadMap(mapId, allowMobileData = true)
             }
 
             NetworkPolicy.WIFI_ONLY -> {
@@ -75,8 +92,8 @@ class RegionFragment : Fragment() {
             }
 
             null -> {
-                showMobileDataDialog() {
-                    regionViewModel.startDownloadMap(regionId, allowMobileData = true)
+                showMobileDataDialog {
+                    mapListViewModel.startDownloadMap(mapId, allowMobileData = true)
                 }
             }
         }
@@ -84,9 +101,9 @@ class RegionFragment : Fragment() {
 
     private fun showNoInternetMessage() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Немає підключення")
+            .setTitle(getString(R.string.not_connection_dialog_title))
             .setMessage(
-                "Для завантаження потрібне підключення до Інтернету."
+                getString(R.string.no_connection_dialog_message)
             )
             .setPositiveButton("OK", null)
             .show()
@@ -94,11 +111,8 @@ class RegionFragment : Fragment() {
 
     private fun showWifiOnlyMessage() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Потрібен Wi-Fi")
-            .setMessage(
-                "Ви заборонили використання мобільних даних. " +
-                        "Завантаження продовжиться, коли буде доступне Wi-Fi."
-            )
+            .setTitle(getString(R.string.wi_fi_dialog_title))
+            .setMessage(getString(R.string.wwi_fi_dialog_message))
             .setPositiveButton("OK", null)
             .show()
     }
@@ -106,11 +120,8 @@ class RegionFragment : Fragment() {
     private fun showMobileDataDialog(onPositiveButtonClicked : () -> Unit = {}) {
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Мобільні дані")
-            .setMessage(
-                "Wi-Fi недоступний. " +
-                        "Використати мобільні дані для завантаження?"
-            )
+            .setTitle(getString(R.string.cell_data_dialog_title))
+            .setMessage(getString(R.string.cell_data_dialog_message))
             .setNegativeButton("Скасувати", null)
             .setPositiveButton("Завантажити") { _, _ ->
                 sessionViewModel.setNetworkPolicy(NetworkPolicy.ANY_NETWORK)
@@ -123,7 +134,7 @@ class RegionFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = RegionItemListBinding.inflate(inflater)
+        binding = MapItemListBinding.inflate(inflater)
         return binding.root
     }
 
@@ -131,24 +142,24 @@ class RegionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.list.layoutManager = LinearLayoutManager(context)
         binding.list.adapter = adapter
-        val regionName = args.parentRegionName
+        val mapName = args.parentMapName
         (requireActivity() as AppCompatActivity)
             .supportActionBar
-            ?.title = if (regionName == "europe") "Downloads Map" else regionName.replaceFirstChar { it.uppercase() }
+            ?.title = if (mapName == "europe") getString(R.string.downloads_map_title) else mapName.replaceFirstChar { it.uppercase() }
         binding.memoryMonitorContainer.visibility = if(args.showMemoryInfo) View.VISIBLE else View.GONE
         binding.europeLabel.visibility = if(args.showMemoryInfo) View.VISIBLE else View.GONE
-        observeRegions()
-        regionViewModel.selectParent(args.parentRegionName)
+        observeMaps()
+        mapListViewModel.selectParent(args.parentMapName)
 
     }
 
-    private fun observeRegions() {
+    private fun observeMaps() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(
                 Lifecycle.State.STARTED
             ) {
-                regionViewModel.regions.collect { regionsList ->
-                    adapter.submitList(regionsList)
+                mapListViewModel.maps.collect { mapsList ->
+                    adapter.submitList(mapsList)
                 }
             }
         }

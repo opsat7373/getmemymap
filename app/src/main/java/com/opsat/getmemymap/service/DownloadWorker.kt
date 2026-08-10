@@ -55,12 +55,12 @@ class DownloadWorker @AssistedInject constructor(
 
                 setForeground(
                     createForegroundInfo(
-                        downloadInfoModel.regionName,
+                        downloadInfoModel.mapName,
                         0
                     )
                 )
                 try {
-                    repository.updateState( downloadInfoModel.regionId, DownloadState.DOWNLOADING)
+                    repository.updateState( downloadInfoModel.mapId, DownloadState.DOWNLOADING)
                     val url = "${BuildConfig.BASE_URL}/download.php?standard=yes&file=${downloadInfoModel.downloadUrl}"
                     val directory = applicationContext.filesDir
 
@@ -76,7 +76,7 @@ class DownloadWorker @AssistedInject constructor(
 
                     val downloadFlow = downloadController.download(
                         url,
-                        downloadInfoModel.regionId,
+                        downloadInfoModel.mapId,
                         file,
                         downloadedBytes = downloadedBytes
                     )
@@ -87,7 +87,7 @@ class DownloadWorker @AssistedInject constructor(
                                 file.renameTo(
                                     File(file.parentFile, destinationFileName)
                                 )
-                                repository.updateState( downloadInfoModel.regionId, DownloadState.COMPLETED)
+                                repository.updateState( downloadInfoModel.mapId, DownloadState.COMPLETED)
                             }
                             DownloadResult.Cancelled -> {
                                 file.delete()
@@ -104,25 +104,25 @@ class DownloadWorker @AssistedInject constructor(
 
                                 setForeground(
                                     createForegroundInfo(
-                                        downloadInfoModel.regionName,
+                                        downloadInfoModel.mapName,
                                         downloadResult.progress
                                     )
                                 )
                             }
 
-                            is DownloadResult.Error -> repository.updateState( downloadInfoModel.regionId, DownloadState.SUSPENDED )
+                            is DownloadResult.Error -> repository.updateState( downloadInfoModel.mapId, DownloadState.SUSPENDED )
                         }
                     }
 
 
                 } catch (e: IOException) {
                     Timber.e(e)
-                    repository.updateState( downloadInfoModel.regionId, DownloadState.SUSPENDED )
+                    repository.updateState( downloadInfoModel.mapId, DownloadState.SUSPENDED )
 
                     return Result.retry()
                 } catch (e: Exception) {
                     Timber.e(e)
-                    repository.updateState( downloadInfoModel.regionId, DownloadState.SUSPENDED )
+                    repository.updateState( downloadInfoModel.mapId, DownloadState.SUSPENDED )
 
                     return Result.failure()
                 }

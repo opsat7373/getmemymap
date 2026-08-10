@@ -2,33 +2,33 @@ package com.opsat.getmemymap.domain.usecase
 
 import com.opsat.getmemymap.domain.model.MapModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository
-import com.opsat.getmemymap.domain.repository.RegionRepository
+import com.opsat.getmemymap.domain.repository.MapRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class GetRegionsWithDownloadStateUseCase @Inject constructor(
-    private val regionRepository: RegionRepository,
+class GetMapsWithDownloadStateUseCase @Inject constructor(
+    private val mapRepository: MapRepository,
     private val downloadRepository: DownloadRepository
 ) {
 
-    operator fun invoke(parentRegion : String?): Flow<List<MapModel>> {
-        val regionsList =  regionRepository.getRegionsInfoList(parentRegion)
+    operator fun invoke(parentMapId : String?): Flow<List<MapModel>> {
+        val mapsList =  mapRepository.getMapInfoList(parentMapId)
         return downloadRepository
-            .getRegionDownloadInfo(parentRegion)
+            .getMapDownloadInfo(parentMapId)
             .map { downloadsList ->
-                regionsList.map { region ->
+                mapsList.map { map ->
                     val downloadInfo = downloadsList.firstOrNull { info ->
-                        info.regionName == region.name
+                        info.mapName == map.name
                     }
                     MapModel(
-                        regionId = region.regionId,
-                        region.name,
-                        translate = region.translate,
-                        region.parentRegionName,
-                        region.downloadFileName,
-                        hasChild = region.hasChild,
-                        downloadAvailable = region.downloadAvailable,
+                        mapId = map.mapId,
+                        map.name,
+                        translate = map.translate,
+                        map.parentMapId,
+                        map.downloadFileName,
+                        hasChild = map.hasChild,
+                        downloadAvailable = map.downloadAvailable,
                         downloadInfo = downloadInfo
                     )
                 }

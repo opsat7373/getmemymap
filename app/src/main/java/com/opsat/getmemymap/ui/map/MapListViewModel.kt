@@ -1,8 +1,8 @@
-package com.opsat.getmemymap.ui.region
+package com.opsat.getmemymap.ui.map
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.opsat.getmemymap.domain.usecase.GetRegionsWithDownloadStateUseCase
+import com.opsat.getmemymap.domain.usecase.GetMapsWithDownloadStateUseCase
 import com.opsat.getmemymap.domain.usecase.QueueDownloadUseCase
 import com.opsat.getmemymap.domain.usecase.QueueStopDownloadUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,36 +16,36 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RegionViewModel @Inject constructor(
-    private val getRegionListUseCase : GetRegionsWithDownloadStateUseCase,
+class MapListViewModel @Inject constructor(
+    private val getMapsWithDownloadStateUseCase : GetMapsWithDownloadStateUseCase,
     private val queueDownloadUseCase: QueueDownloadUseCase,
     private val queueStopDownloadUseCase: QueueStopDownloadUseCase,
 ): ViewModel() {
 
     private val selectedParentName = MutableStateFlow("europe")
 
-    val regions: StateFlow<List<RegionUIItem>> =
+    val maps: StateFlow<List<MapUIItem>> =
         selectedParentName
-            .flatMapLatest { parentRegion ->
-                getRegionListUseCase(parentRegion).map { regionModelList ->
-                    regionModelList.map { regionModel ->
-                        val downloadInfo = regionModel.downloadInfo
+            .flatMapLatest { parentMap ->
+                getMapsWithDownloadStateUseCase(parentMap).map { mapsModelList ->
+                    mapsModelList.map { mapModel ->
+                        val downloadInfo = mapModel.downloadInfo
                         val downloadProgress = if (downloadInfo != null) {
                                 ((downloadInfo.downloadedBytes.toDouble() / maxOf(
                                     downloadInfo.totalBytes,
                                     1
                                 )) * 100).toInt()
                         } else 0
-                        RegionUIItem(
-                            regionId = regionModel.regionId,
-                            regionName = regionModel.name,
-                            regionTranslatedName = regionModel.translate,
-                            parentRegionName = regionModel.parentRegionName,
-                            hasChild = regionModel.hasChild,
-                            canDownload = !regionModel.hasChild && downloadInfo?.state == null,
+                        MapUIItem(
+                            mapId = mapModel.mapId,
+                            mapName = mapModel.name,
+                            mapTranslatedName = mapModel.translate,
+                            parentMapId = mapModel.parentMapName,
+                            hasChild = mapModel.hasChild,
+                            canDownload = !mapModel.hasChild && downloadInfo?.state == null,
                             downloadProgress = downloadProgress,
-                            state = regionModel.downloadInfo?.state,
-                            downloadFileName = regionModel.downloadFileName
+                            state = mapModel.downloadInfo?.state,
+                            downloadFileName = mapModel.downloadFileName
                         )
 
                     }
@@ -60,15 +60,15 @@ class RegionViewModel @Inject constructor(
         selectedParentName.value = parentName
     }
 
-    fun startDownloadMap(regionId : String, allowMobileData : Boolean) {
+    fun startDownloadMap(mapId : String, allowMobileData : Boolean) {
         viewModelScope.launch {
-            queueDownloadUseCase(regionId, allowMobileData)
+            queueDownloadUseCase(mapId, allowMobileData)
         }
     }
 
-    fun stopDownloadMap(region : RegionUIItem) {
+    fun stopDownloadMap(mapUiItem : MapUIItem) {
         viewModelScope.launch {
-            queueStopDownloadUseCase(region.regionId)
+            queueStopDownloadUseCase(mapUiItem.mapId)
         }
     }
 }

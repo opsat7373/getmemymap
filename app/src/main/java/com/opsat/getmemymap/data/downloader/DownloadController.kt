@@ -19,11 +19,11 @@ class DownloadController @Inject constructor(
 ) {
     private var currentCall: Call? = null
 
-    private var currentRegionId: String? = null
+    private var currentMapId: String? = null
 
     fun download(
         url: String,
-        regionId: String,
+        mapId: String,
         outputFile: File,
         downloadedBytes : Long = 0,
     ): Flow<DownloadResult> = callbackFlow {
@@ -35,7 +35,7 @@ class DownloadController @Inject constructor(
         val call = client.newCall(request)
 
         currentCall = call
-        currentRegionId = regionId
+        currentMapId = mapId
 
         call.enqueue(
             object : Callback {
@@ -135,7 +135,7 @@ class DownloadController @Inject constructor(
         )
         awaitClose {
             currentCall = null
-            currentRegionId = null
+            currentMapId = null
         }
     }
 
@@ -150,10 +150,10 @@ class DownloadController @Inject constructor(
         return response.body.contentLength()
     }
 
-    fun cancel(regionId : String) {
-        if (currentRegionId == regionId) {
+    fun cancel(mapId : String) {
+        if (currentMapId == mapId) {
             currentCall?.cancel()
-            currentRegionId = null
+            currentMapId = null
         }
     }
 }

@@ -3,15 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/regionFragment">
+    app:startDestination="@id/mapListFragment">
 
     <fragment
-        android:id="@+id/regionFragment"
-        android:name="com.opsat.getmemymap.ui.region.RegionFragment"
-        android:label="region_item_list"
-        tools:layout="@layout/region_item_list" >
+        android:id="@+id/mapListFragment"
+        android:name="com.opsat.getmemymap.ui.map.MapListFragment"
+        android:label="map_item_list"
+        tools:layout="@layout/map_item_list" >
         <argument
-            android:name="parentRegionName"
+            android:name="parentMapName"
             app:argType="string"
             app:nullable="false"
             android:defaultValue="europe"/>
@@ -20,10 +20,10 @@
             app:argType="boolean"
             android:defaultValue="true"/>
         <action
-            android:id="@+id/action_regionFragment_self"
-            app:destination="@id/regionFragment">
+            android:id="@+id/action_mapFragment_self"
+            app:destination="@id/mapListFragment">
             <argument
-                android:name="parentRegionName"
+                android:name="parentMapName"
                 app:nullable="false"
                 android:defaultValue=""/>
             <argument

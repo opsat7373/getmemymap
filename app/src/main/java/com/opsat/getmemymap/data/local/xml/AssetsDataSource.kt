@@ -18,7 +18,7 @@ class AssetsDataSource @Inject constructor(
 
         val stack = ArrayDeque<String?>()
         val tempList = mutableMapOf<String, MutableList<String>>()
-        val regionMap = mutableMapOf<String, Map<String, String>>()
+        val mapList = mutableMapOf<String, Map<String, String>>()
 
 
         while (parser.eventType != XmlPullParser.END_DOCUMENT) {
@@ -29,32 +29,32 @@ class AssetsDataSource @Inject constructor(
 
                     if (parser.name == "region") {
 
-                        val regionName = parser.getAttributeValue(null, "name") ?: ""
+                        val mapName = parser.getAttributeValue(null, "name") ?: ""
                         val parsedPrefix = parser.getAttributeValue(null, "inner_download_prefix")
                         val translate = parser.getAttributeValue(null, "translate")
                         val type = parser.getAttributeValue(null, "type")
                         val innerDownloadPrefix = if (parsedPrefix?.isNotBlank() == true) {
-                                "${if (parsedPrefix == $$"$name") regionName else parsedPrefix}_"
+                                "${if (parsedPrefix == $$"$name") mapName else parsedPrefix}_"
                         } else ""
 
 
-                        val parsedRegionInfo = mapOf("name" to regionName,
+                        val parsedMapInfo = mapOf("name" to mapName,
                             "inner_download_prefix" to innerDownloadPrefix,
                             "translate" to translate,
                             "type" to type)
-                        regionMap[regionName] = parsedRegionInfo
+                        mapList[mapName] = parsedMapInfo
 
                         val parentId = if (stack.isEmpty()) {
                             ""
                         } else {
                              stack.last() ?: ""
                         }
-                        stack.addLast(regionName)
+                        stack.addLast(mapName)
 
                         if (!tempList.containsKey(parentId)) {
                             tempList[parentId] = mutableListOf()
                         }
-                        tempList[parentId]?.add(regionName)
+                        tempList[parentId]?.add(mapName)
 
                     }
                 }
@@ -72,21 +72,21 @@ class AssetsDataSource @Inject constructor(
 
 
 
-        return tempList.mapValues{(parentRegionName, childList) ->
-            childList.map { regionName ->
-                val regionName = (regionMap[regionName]?: emptyMap()) ["name"] ?: regionName
-                val regionPrefix = (regionMap[parentRegionName]?: emptyMap()) ["inner_download_prefix"]
-                val translate = (regionMap[regionName]?: emptyMap()) ["translate"] ?: regionName
-                val type = (regionMap[regionName]?: emptyMap()) ["type"] ?: ""
-                val region = MapXml(
-                    name = regionName,
-                    translate = (extractTranslation(translate) ?: regionName).replaceFirstChar { it.uppercase() },
-                    parentRegionName = parentRegionName ?: "",
-                    downloadPrefix = regionPrefix,
-                    hasChild = tempList[regionName]?.isNotEmpty() ?: false,
+        return tempList.mapValues{(parentMapName, childList) ->
+            childList.map { mapName ->
+                val mapName = (mapList[mapName]?: emptyMap()) ["name"] ?: mapName
+                val mapPrefix = (mapList[parentMapName]?: emptyMap()) ["inner_download_prefix"]
+                val translate = (mapList[mapName]?: emptyMap()) ["translate"] ?: mapName
+                val type = (mapList[mapName]?: emptyMap()) ["type"] ?: ""
+                val mapXml = MapXml(
+                    name = mapName,
+                    translate = (extractTranslation(translate) ?: mapName).replaceFirstChar { it.uppercase() },
+                    parentMapName = parentMapName ?: "",
+                    downloadPrefix = mapPrefix,
+                    hasChild = tempList[mapName]?.isNotEmpty() ?: false,
                     downloadAvailable = type == "map"
                     )
-                region
+                mapXml
             }
         }
     }

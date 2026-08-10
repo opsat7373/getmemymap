@@ -4,14 +4,14 @@ import androidx.room.Entity
 
 @Entity(
     tableName = "downloads",
-    primaryKeys = ["regionId"]
+    primaryKeys = ["mapId"]
 )
 data class DownloadEntity(
-    val regionId : String,
+    val mapId : String,
 
-    val parentRegionName: String,
+    val parentMapId: String,
 
-    val regionName: String,
+    val mapName: String,
 
     val downloadUrl: String,
 

@@ -5,5 +5,14 @@ enum class DownloadState {
     DOWNLOADING,
     SUSPENDED,
     COMPLETED,
-    FAILED
+    FAILED;
+
+    val isActive: Boolean
+        get() = when (this) {
+            QUEUED,
+            DOWNLOADING,
+            SUSPENDED -> true
+
+            else -> false
+        }
 }

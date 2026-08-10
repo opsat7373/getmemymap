@@ -1,10 +1,10 @@
 package com.opsat.getmemymap.domain.model
 
 data class MapModel (
-    val regionId: String,
+    val mapId: String,
     val name : String,
     val translate : String,
-    val parentRegionName: String,
+    val parentMapName: String,
     val downloadFileName: String? = null,
     val hasChild: Boolean,
     val downloadAvailable: Boolean,

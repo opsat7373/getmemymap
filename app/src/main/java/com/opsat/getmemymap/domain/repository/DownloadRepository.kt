@@ -7,16 +7,16 @@ import kotlinx.coroutines.flow.Flow
 
 interface DownloadRepository {
 
-    suspend fun addDownloadMap(region : MapInfoModel)
+    suspend fun addDownloadMap(mapInfo : MapInfoModel)
 
-    suspend fun stopDownloadMap(region : MapInfoModel)
+    suspend fun stopDownloadMap(mapInfo : MapInfoModel)
 
-    fun getRegionDownloadInfo(parentRegionName : String?) : Flow<List<MapDownloadingInfoModel>>
+    fun getMapDownloadInfo(parentMapId : String?) : Flow<List<MapDownloadingInfoModel>>
 
     fun getEnqueuedDownloads() : MapDownloadingInfoModel?
 
     suspend fun update(downloadInfoModel : MapDownloadingInfoModel)
 
-    fun updateState(regionId : String, state : DownloadState)
+    fun updateState(mapId : String, state : DownloadState)
 
 }

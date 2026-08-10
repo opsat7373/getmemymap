@@ -1,9 +1,9 @@
 package com.opsat.getmemymap.di
 
-import com.opsat.getmemymap.data.local.RegionRepositoryImpl
+import com.opsat.getmemymap.data.local.MapRepositoryImpl
 import com.opsat.getmemymap.data.local.DownloadRepositoryImpl
 import com.opsat.getmemymap.domain.repository.DownloadRepository
-import com.opsat.getmemymap.domain.repository.RegionRepository
+import com.opsat.getmemymap.domain.repository.MapRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,8 +17,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindMapsRepository(
-        impl: RegionRepositoryImpl
-    ): RegionRepository
+        impl: MapRepositoryImpl
+    ): MapRepository
 
     @Binds
     @Singleton
