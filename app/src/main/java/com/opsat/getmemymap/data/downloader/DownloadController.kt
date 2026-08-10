@@ -8,6 +8,7 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -40,14 +41,15 @@ class DownloadController @Inject constructor(
             object : Callback {
                 override fun onFailure(
                     call: Call,
-                    exception: IOException
+                    e: IOException
                 ) {
                     if (call.isCanceled()) {
                         trySend(DownloadResult.Cancelled)
                         close()
                     } else {
+                        Timber.e(e)
                         trySend(
-                            DownloadResult.Error(exception)
+                            DownloadResult.Error(e)
                         )
                         close()
                     }
@@ -115,6 +117,7 @@ class DownloadController @Inject constructor(
                                 output.flush()
                             }
                         }
+                        trySend(DownloadResult.Success)
                     } catch (exception : IOException) {
                         if (call.isCanceled()) {
                             trySend(DownloadResult.Cancelled)
@@ -126,7 +129,6 @@ class DownloadController @Inject constructor(
                             close()
                         }
                     }
-                    trySend(DownloadResult.Success)
                     close()
                 }
             }
@@ -137,7 +139,7 @@ class DownloadController @Inject constructor(
         }
     }
 
-    fun getTotalBytes(response: Response): Long {
+    private fun getTotalBytes(response: Response): Long {
         val contentRange = response.header("Content-Range")
 
         if (contentRange != null) {

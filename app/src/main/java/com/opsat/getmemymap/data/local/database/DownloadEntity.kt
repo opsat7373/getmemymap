@@ -1,15 +1,9 @@
 package com.opsat.getmemymap.data.local.database
 
 import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "downloads",
-    indices = [
-        Index("state"),
-        Index("queuePosition")
-    ],
     primaryKeys = ["regionId"]
 )
 data class DownloadEntity(

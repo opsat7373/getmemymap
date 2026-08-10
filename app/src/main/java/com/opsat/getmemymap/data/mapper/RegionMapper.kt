@@ -2,12 +2,12 @@ package com.opsat.getmemymap.data.mapper
 
 import com.opsat.getmemymap.data.local.database.DbDownloadState
 import com.opsat.getmemymap.data.local.database.DownloadEntity
-import com.opsat.getmemymap.data.local.xml.RegionXml
+import com.opsat.getmemymap.data.local.xml.MapXml
 import com.opsat.getmemymap.domain.model.DownloadState
 import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
 import com.opsat.getmemymap.domain.model.RegionInfoModel
 
-fun RegionXml.toDomainModel() = RegionInfoModel(
+fun MapXml.toDomainModel() = RegionInfoModel(
     regionId = "${parentRegionName}_${name}",
     name = name,
     translate = translate,

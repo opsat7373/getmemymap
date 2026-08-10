@@ -1,7 +1,6 @@
 package com.opsat.getmemymap.data.local.database
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -37,26 +36,11 @@ interface DownloadDao {
     suspend fun delete(regionId: String)
 
     @Query("""
-        SELECT *
-        FROM downloads
-        ORDER BY queuePosition
-    """)
-    fun observeQueue(): Flow<List<DownloadEntity>>
-
-    @Query("""
         UPDATE downloads
         SET state = :state
         WHERE regionId = :regionId
     """)
     fun updateState(regionId: String, state: String)
-
-    @Query("""
-        SELECT *
-        FROM downloads
-        WHERE state = 'DOWNLOADING'
-        LIMIT 1
-    """)
-    suspend fun getCurrentDownload(): DownloadEntity?
 
     @Query("""
         SELECT *
@@ -75,21 +59,4 @@ interface DownloadDao {
         LIMIT 1
     """)
     fun getQueued(): DownloadEntity?
-
-    @Query("""
-        SELECT *
-        FROM downloads
-        WHERE state = 'QUEUED'
-        ORDER BY queuePosition
-        LIMIT 1
-    """)
-    suspend fun getNextInQueue(): DownloadEntity?
-
-    @Query("""
-        UPDATE downloads
-        SET
-            state = 'QUEUED'
-        WHERE state = 'DOWNLOADING'
-    """)
-    suspend fun restoreInterruptedDownloads()
 }

@@ -11,7 +11,7 @@ class AssetsDataSource @Inject constructor(
     private val context: Context
 ) {
 
-    fun getMapsList() : Map<String?, List<RegionXml>> {
+    fun getMapsList() : Map<String?, List<MapXml>> {
 
         val parser = Xml.newPullParser()
         parser.setInput(context.assets.open("regions.xml"), "UTF-8")
@@ -78,7 +78,7 @@ class AssetsDataSource @Inject constructor(
                 val regionPrefix = (regionMap[parentRegionName]?: emptyMap()) ["inner_download_prefix"]
                 val translate = (regionMap[regionName]?: emptyMap()) ["translate"] ?: regionName
                 val type = (regionMap[regionName]?: emptyMap()) ["type"] ?: ""
-                val region = RegionXml(
+                val region = MapXml(
                     name = regionName,
                     translate = (extractTranslation(translate) ?: regionName).replaceFirstChar { it.uppercase() },
                     parentRegionName = parentRegionName ?: "",

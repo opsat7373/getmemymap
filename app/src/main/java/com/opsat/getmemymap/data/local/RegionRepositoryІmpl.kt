@@ -7,10 +7,10 @@ import com.opsat.getmemymap.domain.repository.RegionRepository
 import javax.inject.Inject
 
 class RegionRepositoryImpl @Inject constructor(
-    private val assetsDataSource: AssetsDataSource
+    assetsDataSource: AssetsDataSource
 ) : RegionRepository {
 
-    lateinit var regionMap : Map<String?, List<RegionInfoModel>>
+    var regionMap : Map<String?, List<RegionInfoModel>>
     init {
         val xmlRegionMap = assetsDataSource.getMapsList()
         regionMap = xmlRegionMap.mapValues { xmlRegionEntry ->

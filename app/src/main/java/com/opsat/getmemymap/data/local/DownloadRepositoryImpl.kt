@@ -8,7 +8,6 @@ import com.opsat.getmemymap.data.mapper.toDomainModel
 import com.opsat.getmemymap.domain.model.DownloadState
 import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
 import com.opsat.getmemymap.domain.model.RegionInfoModel
-import com.opsat.getmemymap.domain.model.RegionModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

@@ -93,10 +93,6 @@ class DownloadWorker @AssistedInject constructor(
                                 file.delete()
                             }
                             is DownloadResult.DownloadProgress -> {
-                                val progress =
-                                    ((downloadResult.downloadedBytes * 100) / downloadResult.totalBytes)
-                                        .toInt()
-
                                 repository.update(
                                     downloadInfoModel.copy(
                                         state = DownloadState.DOWNLOADING,
@@ -109,7 +105,7 @@ class DownloadWorker @AssistedInject constructor(
                                 setForeground(
                                     createForegroundInfo(
                                         downloadInfoModel.regionName,
-                                        progress
+                                        downloadResult.progress
                                     )
                                 )
                             }
