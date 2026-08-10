@@ -1,6 +1,6 @@
 package com.opsat.getmemymap.domain.model
 
-class RegionInfoModel (
+class MapInfoModel (
     val regionId : String,
     val name : String,
     val translate : String,

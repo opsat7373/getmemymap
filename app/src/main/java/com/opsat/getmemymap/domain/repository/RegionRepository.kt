@@ -1,9 +1,9 @@
 package com.opsat.getmemymap.domain.repository
 
-import com.opsat.getmemymap.domain.model.RegionInfoModel
+import com.opsat.getmemymap.domain.model.MapInfoModel
 
 interface RegionRepository {
-    fun getRegionsInfoList(parentRegionName : String?) : List<RegionInfoModel>
+    fun getRegionsInfoList(parentRegionName : String?) : List<MapInfoModel>
 
-    fun getRegionById(regionId : String) : RegionInfoModel
+    fun getRegionById(regionId : String) : MapInfoModel
 }

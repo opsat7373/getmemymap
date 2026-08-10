@@ -1,6 +1,6 @@
 package com.opsat.getmemymap.domain.model
 
-data class RegionModel (
+data class MapModel (
     val regionId: String,
     val name : String,
     val translate : String,
@@ -8,5 +8,5 @@ data class RegionModel (
     val downloadFileName: String? = null,
     val hasChild: Boolean,
     val downloadAvailable: Boolean,
-    val downloadInfo: RegionDownloadInfoModel? = null
+    val downloadInfo: MapDownloadingInfoModel? = null
 )

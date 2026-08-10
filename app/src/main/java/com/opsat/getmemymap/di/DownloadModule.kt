@@ -13,7 +13,7 @@ import okhttp3.OkHttpClient;
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
+object DownloadModule {
 
     @Provides
     @Singleton

@@ -1,8 +1,6 @@
 package com.opsat.getmemymap.domain.model
 
-import com.opsat.getmemymap.data.local.database.DbDownloadState
-
-data class RegionDownloadInfoModel(
+data class MapDownloadingInfoModel(
     val regionId: String,
     val regionName : String,
     val parentRegionName: String,

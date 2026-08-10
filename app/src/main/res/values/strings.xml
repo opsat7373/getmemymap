@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Get Me My Map</string>
+    <string name="notification_download_label">Downloads</string>
 </resources>

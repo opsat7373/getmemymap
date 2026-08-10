@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.ListAdapter
 import com.opsat.getmemymap.R
 import com.opsat.getmemymap.databinding.RegionItemBinding
 import com.opsat.getmemymap.domain.model.DownloadState
-import com.opsat.getmemymap.domain.model.RegionModel
 
 class MyRegionRecyclerViewAdapter(val onCancelClick : (RegionUIItem) -> Unit = {},
                                   val onItemClick : (RegionUIItem) -> Unit = {} )

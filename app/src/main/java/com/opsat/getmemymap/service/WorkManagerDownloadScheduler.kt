@@ -5,7 +5,6 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import com.opsat.getmemymap.domain.repository.DownloadScheduler
 import javax.inject.Inject
 
@@ -13,15 +12,10 @@ class WorkManagerDownloadScheduler @Inject constructor(
     private val workManager: WorkManager
 ) : DownloadScheduler {
 
-    override fun schedule(downloadId: String, allowMobileData: Boolean) {
+    override fun schedule(allowMobileData: Boolean) {
 
         val request =
             OneTimeWorkRequestBuilder<DownloadWorker>()
-                .setInputData(
-                    workDataOf(
-                        DownloadWorker.DOWNLOAD_ID to downloadId
-                    )
-                )
                 .setConstraints(
                     Constraints.Builder()
                         .setRequiredNetworkType(

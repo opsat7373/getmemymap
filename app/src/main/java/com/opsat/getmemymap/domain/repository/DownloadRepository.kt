@@ -1,21 +1,21 @@
 package com.opsat.getmemymap.domain.repository
 
 import com.opsat.getmemymap.domain.model.DownloadState
-import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
-import com.opsat.getmemymap.domain.model.RegionInfoModel
+import com.opsat.getmemymap.domain.model.MapDownloadingInfoModel
+import com.opsat.getmemymap.domain.model.MapInfoModel
 import kotlinx.coroutines.flow.Flow
 
 interface DownloadRepository {
 
-    suspend fun addDownloadMap(region : RegionInfoModel)
+    suspend fun addDownloadMap(region : MapInfoModel)
 
-    suspend fun stopDownloadMap(region : RegionInfoModel)
+    suspend fun stopDownloadMap(region : MapInfoModel)
 
-    fun getRegionDownloadInfo(parentRegionName : String?) : Flow<List<RegionDownloadInfoModel>>
+    fun getRegionDownloadInfo(parentRegionName : String?) : Flow<List<MapDownloadingInfoModel>>
 
-    fun getEnqueuedDownloads() : RegionDownloadInfoModel?
+    fun getEnqueuedDownloads() : MapDownloadingInfoModel?
 
-    suspend fun update(downloadInfoModel : RegionDownloadInfoModel)
+    suspend fun update(downloadInfoModel : MapDownloadingInfoModel)
 
     fun updateState(regionId : String, state : DownloadState)
 

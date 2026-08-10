@@ -6,8 +6,8 @@ import com.opsat.getmemymap.data.local.database.DbDownloadState
 import com.opsat.getmemymap.data.mapper.toDbEntity
 import com.opsat.getmemymap.data.mapper.toDomainModel
 import com.opsat.getmemymap.domain.model.DownloadState
-import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
-import com.opsat.getmemymap.domain.model.RegionInfoModel
+import com.opsat.getmemymap.domain.model.MapDownloadingInfoModel
+import com.opsat.getmemymap.domain.model.MapInfoModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -17,7 +17,7 @@ class DownloadRepositoryImpl @Inject constructor(
 
     private val downloadDao: DownloadDao
 ) : DownloadRepository {
-    override suspend fun addDownloadMap(region: RegionInfoModel) {
+    override suspend fun addDownloadMap(region: MapInfoModel) {
         val downloadFileName = region.downloadFileName
         if (downloadFileName != null) {
             val downloadEntity = DownloadEntity(
@@ -36,20 +36,20 @@ class DownloadRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun stopDownloadMap(region: RegionInfoModel) {
+    override suspend fun stopDownloadMap(region: MapInfoModel) {
         downloadDao.delete(region.regionId)
     }
 
-    override fun getRegionDownloadInfo(parentRegionName: String?): Flow<List<RegionDownloadInfoModel>> =
+    override fun getRegionDownloadInfo(parentRegionName: String?): Flow<List<MapDownloadingInfoModel>> =
         downloadDao.observeRegionsByParentName(parentRegionName).map { list ->
             list.map { regionEntity -> regionEntity.toDomainModel()
         }
     }
 
-    override fun getEnqueuedDownloads(): RegionDownloadInfoModel? =
+    override fun getEnqueuedDownloads(): MapDownloadingInfoModel? =
         downloadDao.getQueued()?.toDomainModel()
 
-    override suspend fun update(downloadInfoModel: RegionDownloadInfoModel) {
+    override suspend fun update(downloadInfoModel: MapDownloadingInfoModel) {
         return downloadDao.update(downloadInfoModel.toDbEntity())
     }
 

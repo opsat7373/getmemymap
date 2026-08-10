@@ -1,6 +1,6 @@
 package com.opsat.getmemymap.domain.usecase
 
-import com.opsat.getmemymap.domain.model.RegionModel
+import com.opsat.getmemymap.domain.model.MapModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository
 import com.opsat.getmemymap.domain.repository.RegionRepository
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +12,7 @@ class GetRegionsWithDownloadStateUseCase @Inject constructor(
     private val downloadRepository: DownloadRepository
 ) {
 
-    operator fun invoke(parentRegion : String?): Flow<List<RegionModel>> {
+    operator fun invoke(parentRegion : String?): Flow<List<MapModel>> {
         val regionsList =  regionRepository.getRegionsInfoList(parentRegion)
         return downloadRepository
             .getRegionDownloadInfo(parentRegion)
@@ -21,7 +21,7 @@ class GetRegionsWithDownloadStateUseCase @Inject constructor(
                     val downloadInfo = downloadsList.firstOrNull { info ->
                         info.regionName == region.name
                     }
-                    RegionModel(
+                    MapModel(
                         regionId = region.regionId,
                         region.name,
                         translate = region.translate,

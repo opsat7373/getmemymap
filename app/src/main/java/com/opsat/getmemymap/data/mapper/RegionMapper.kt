@@ -4,10 +4,10 @@ import com.opsat.getmemymap.data.local.database.DbDownloadState
 import com.opsat.getmemymap.data.local.database.DownloadEntity
 import com.opsat.getmemymap.data.local.xml.MapXml
 import com.opsat.getmemymap.domain.model.DownloadState
-import com.opsat.getmemymap.domain.model.RegionDownloadInfoModel
-import com.opsat.getmemymap.domain.model.RegionInfoModel
+import com.opsat.getmemymap.domain.model.MapDownloadingInfoModel
+import com.opsat.getmemymap.domain.model.MapInfoModel
 
-fun MapXml.toDomainModel() = RegionInfoModel(
+fun MapXml.toDomainModel() = MapInfoModel(
     regionId = "${parentRegionName}_${name}",
     name = name,
     translate = translate,
@@ -18,7 +18,7 @@ fun MapXml.toDomainModel() = RegionInfoModel(
 )
 
 fun DownloadEntity.toDomainModel() =
-    RegionDownloadInfoModel(
+    MapDownloadingInfoModel(
         regionId = "${parentRegionName}_${regionName}",
         regionName = regionName,
         parentRegionName = parentRegionName,
@@ -30,7 +30,7 @@ fun DownloadEntity.toDomainModel() =
         totalBytes = totalBytes
     )
 
-fun RegionDownloadInfoModel.toDbEntity() =
+fun MapDownloadingInfoModel.toDbEntity() =
     DownloadEntity (
         regionId = "${parentRegionName}_${regionName}",
         regionName = regionName,

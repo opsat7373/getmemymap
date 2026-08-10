@@ -2,9 +2,6 @@ package com.opsat.getmemymap.ui.region
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.opsat.getmemymap.domain.model.RegionModel
-import com.opsat.getmemymap.domain.repository.DownloadRepository
-import com.opsat.getmemymap.domain.repository.RegionRepository
 import com.opsat.getmemymap.domain.usecase.GetRegionsWithDownloadStateUseCase
 import com.opsat.getmemymap.domain.usecase.QueueDownloadUseCase
 import com.opsat.getmemymap.domain.usecase.QueueStopDownloadUseCase
@@ -12,7 +9,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn

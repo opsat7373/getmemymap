@@ -1,9 +1,7 @@
 package com.opsat.getmemymap.domain.usecase
 
 import com.opsat.getmemymap.data.downloader.DownloadController
-import com.opsat.getmemymap.domain.model.RegionModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository
-import com.opsat.getmemymap.domain.repository.DownloadScheduler
 import com.opsat.getmemymap.domain.repository.RegionRepository
 import javax.inject.Inject
 

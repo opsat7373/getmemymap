@@ -22,7 +22,7 @@ import java.io.IOException
 
 @HiltWorker
 class DownloadWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
+    @Assisted val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val repository: DownloadRepository,
     private val downloadController : DownloadController
@@ -34,7 +34,7 @@ class DownloadWorker @AssistedInject constructor(
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Downloads",
+            appContext.getString(R.string.notification_download_label),
             NotificationManager.IMPORTANCE_LOW
         )
 
@@ -146,7 +146,7 @@ class DownloadWorker @AssistedInject constructor(
                     R.drawable.ic_action_import
                 )
                 .setContentTitle(
-                    "Downloading"
+                    appContext.getString(R.string.notification_download_label),
                 )
                 .setContentText(
                     fileName
@@ -167,9 +167,6 @@ class DownloadWorker @AssistedInject constructor(
     }
 
     companion object {
-
-        const val DOWNLOAD_ID = "download_id"
-
         private const val CHANNEL_ID = "downloads"
         private const val NOTIFICATION_ID = 1001
     }
