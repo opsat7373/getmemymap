@@ -1,6 +1,5 @@
 package com.opsat.getmemymap.domain.usecase
 
-import com.opsat.getmemymap.domain.model.DownloadState
 import com.opsat.getmemymap.domain.model.RegionModel
 import com.opsat.getmemymap.domain.repository.DownloadRepository
 import com.opsat.getmemymap.domain.repository.RegionRepository
@@ -25,10 +24,11 @@ class GetRegionsWithDownloadStateUseCase @Inject constructor(
                     RegionModel(
                         regionId = region.regionId,
                         region.name,
+                        translate = region.translate,
                         region.parentRegionName,
                         region.downloadFileName,
                         hasChild = region.hasChild,
-                        canDownload = region.hasChild,
+                        downloadAvailable = region.downloadAvailable,
                         downloadInfo = downloadInfo
                     )
                 }

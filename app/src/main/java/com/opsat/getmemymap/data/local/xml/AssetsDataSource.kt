@@ -31,12 +31,17 @@ class AssetsDataSource @Inject constructor(
 
                         val regionName = parser.getAttributeValue(null, "name") ?: ""
                         val parsedPrefix = parser.getAttributeValue(null, "inner_download_prefix")
+                        val translate = parser.getAttributeValue(null, "translate")
+                        val type = parser.getAttributeValue(null, "type")
                         val innerDownloadPrefix = if (parsedPrefix?.isNotBlank() == true) {
                                 "${if (parsedPrefix == $$"$name") regionName else parsedPrefix}_"
                         } else ""
 
 
-                        val parsedRegionInfo = mapOf("name" to regionName, "inner_download_prefix" to innerDownloadPrefix)
+                        val parsedRegionInfo = mapOf("name" to regionName,
+                            "inner_download_prefix" to innerDownloadPrefix,
+                            "translate" to translate,
+                            "type" to type)
                         regionMap[regionName] = parsedRegionInfo
 
                         val parentId = if (stack.isEmpty()) {
@@ -71,14 +76,32 @@ class AssetsDataSource @Inject constructor(
             childList.map { regionName ->
                 val regionName = (regionMap[regionName]?: emptyMap()) ["name"] ?: regionName
                 val regionPrefix = (regionMap[parentRegionName]?: emptyMap()) ["inner_download_prefix"]
+                val translate = (regionMap[regionName]?: emptyMap()) ["translate"] ?: regionName
+                val type = (regionMap[regionName]?: emptyMap()) ["type"] ?: ""
                 val region = RegionXml(
                     name = regionName,
+                    translate = (extractTranslation(translate) ?: regionName).replaceFirstChar { it.uppercase() },
                     parentRegionName = parentRegionName ?: "",
                     downloadPrefix = regionPrefix,
-                    hasChild = tempList[regionName]?.isNotEmpty() ?: false
+                    hasChild = tempList[regionName]?.isNotEmpty() ?: false,
+                    downloadAvailable = type == "map"
                     )
                 region
             }
         }
+    }
+
+    private fun extractTranslation(translate: String?): String? {
+        if (translate.isNullOrBlank()) {
+            return null
+        }
+
+        val value = translate
+            .split(";")
+            .firstOrNull { it.startsWith("name:en=") }
+            ?.substringAfter("name:en=")
+            ?: translate.substringBefore(";")
+
+        return value.takeIf { it.isNotBlank() }
     }
 }

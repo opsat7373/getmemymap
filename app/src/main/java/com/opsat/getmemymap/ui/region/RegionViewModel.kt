@@ -43,6 +43,7 @@ class RegionViewModel @Inject constructor(
                         RegionUIItem(
                             regionId = regionModel.regionId,
                             regionName = regionModel.name,
+                            regionTranslatedName = regionModel.translate,
                             parentRegionName = regionModel.parentRegionName,
                             hasChild = regionModel.hasChild,
                             canDownload = !regionModel.hasChild && downloadInfo?.state == null,

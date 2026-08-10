@@ -136,6 +136,7 @@ class RegionFragment : Fragment() {
             .supportActionBar
             ?.title = if (regionName == "europe") "Downloads Map" else regionName.replaceFirstChar { it.uppercase() }
         binding.memoryMonitorContainer.visibility = if(args.showMemoryInfo) View.VISIBLE else View.GONE
+        binding.europeLabel.visibility = if(args.showMemoryInfo) View.VISIBLE else View.GONE
         observeRegions()
         regionViewModel.selectParent(args.parentRegionName)
 

@@ -23,6 +23,7 @@
         android:layout_marginStart="64dp"
         android:textAppearance="?attr/textAppearanceListItem"
         android:textSize="16sp"
+        android:textColor="#212121"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

@@ -10,9 +10,11 @@ import com.opsat.getmemymap.domain.model.RegionInfoModel
 fun RegionXml.toDomainModel() = RegionInfoModel(
     regionId = "${parentRegionName}_${name}",
     name = name,
+    translate = translate,
     parentRegionName = parentRegionName,
     downloadFileName = "${downloadPrefix}${name}_europe_2.obf.zip".replaceFirstChar { it.uppercase() },
-    hasChild = hasChild
+    hasChild = hasChild,
+    downloadAvailable = downloadAvailable
 )
 
 fun DownloadEntity.toDomainModel() =

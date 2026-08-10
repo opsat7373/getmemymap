@@ -18,20 +18,35 @@
         android:background="@drawable/bg_card"
         tools:layout="@layout/fragment_memory_monitor"/>
 
+    <TextView
+        android:id="@+id/europeLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Europe"
+        android:paddingStart="16dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:layout_marginTop="32dp"
+        app:layout_goneMarginTop="0dp"
+        android:background="@drawable/bg_card"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/memoryMonitorContainer"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
         android:name="com.opsat.getmemymap.ui.RegionFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="32dp"
-        app:layout_goneMarginTop="0dp"
-        android:background="@drawable/bg_card"
         android:elevation="2dp"
+        android:background="@drawable/bg_card"
         app:layoutManager="LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/memoryMonitorContainer"
+        app:layout_constraintTop_toBottomOf="@id/europeLabel"
         tools:context=".ui.region.RegionFragment"
         tools:listitem="@layout/region_item" />
 
